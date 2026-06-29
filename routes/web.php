@@ -27,6 +27,11 @@ Route::get('/result', function () {
     return view('pages.result');
 });
 
+// Map Page (Faskes Terdekat)
+Route::get('/map', function () {
+    return view('pages.map');
+});
+
 // Design System Test Page
 Route::get('/test', function () {
     return view('test');

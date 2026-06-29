@@ -3,7 +3,7 @@
 @section('title', 'Kuesioner Skrining — Sehati')
 
 @section('content')
-    <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8" x-data="{ step: 1, totalSteps: 3 }">
+    <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8" x-data="{ step: 1, totalSteps: 3, isLoading: false }" data-aos="fade-up">
         
         {{-- Progress Header --}}
         <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6 mb-6 sticky top-4 z-30">
@@ -18,7 +18,7 @@
         </div>
 
         {{-- Form Kuesioner --}}
-        <form action="/result" method="GET">
+        <form action="/result" method="GET" @submit.prevent="isLoading = true; setTimeout(() => $el.submit(), 2500)">
             
             {{-- Bagian 1: Gaya Hidup --}}
             <div x-show="step === 1" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 transform translate-x-4" x-transition:enter-end="opacity-100 transform translate-x-0">
@@ -188,5 +188,20 @@
             </div>
 
         </form>
+
+        {{-- Loading Overlay --}}
+        <div x-show="isLoading" style="display: none;" class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-white/90 backdrop-blur-sm" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100">
+            <lottie-player 
+                src="{{ asset('img/heartbeat.json') }}" 
+                background="transparent" 
+                speed="1" 
+                style="width: 200px; height: 200px;" 
+                loop 
+                autoplay>
+            </lottie-player>
+            <h3 class="mt-4 text-xl font-bold text-gray-900 animate-pulse">Sedang menganalisis hasil skrining Anda...</h3>
+            <p class="text-sm text-gray-500 mt-2">Harap tunggu sebentar</p>
+        </div>
+
     </div>
 @endsection

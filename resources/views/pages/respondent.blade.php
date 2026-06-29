@@ -3,7 +3,7 @@
 @section('title', 'Data Diri Responden — Sehati')
 
 @section('content')
-    <div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-12" data-aos="fade-up">
         
         {{-- Header --}}
         <div class="text-center mb-8">

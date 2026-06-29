@@ -4,7 +4,7 @@
 
 @php
     // Get answers from URL
-    $q1 = (int) request('q1', 2); // Default to best case if missing
+    $q1 = (int) request('q1', 2);
     $q2 = (int) request('q2', 1);
     $q3 = (int) request('q3', 1);
     $q4 = (int) request('q4', 0);
@@ -26,8 +26,8 @@
     $pt_q9 = ($q9 === 1) ? 2 : 0;
 
     // Totals
-    $diabetesScore = $pt_q1 + $pt_q2 + $pt_q4 + $pt_q5 + $pt_q7 + $pt_q8; // Max: 10
-    $hypertensionScore = $pt_q1 + $pt_q2 + $pt_q3 + $pt_q6 + $pt_q7 + $pt_q9; // Max: 10
+    $diabetesScore = $pt_q1 + $pt_q2 + $pt_q4 + $pt_q5 + $pt_q7 + $pt_q8;
+    $hypertensionScore = $pt_q1 + $pt_q2 + $pt_q3 + $pt_q6 + $pt_q7 + $pt_q9;
 
     // Categorize Diabetes
     if ($diabetesScore <= 2) {
@@ -93,14 +93,14 @@
     <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
         
         {{-- Header --}}
-        <div class="text-center mb-10">
+        <div class="text-center mb-10" data-aos="fade-down">
             <h1 class="text-3xl font-extrabold text-gray-900 mb-2">Laporan Hasil Skrining</h1>
             <p class="text-gray-500">Berikut adalah kalkulasi risiko kesehatan Anda berdasarkan jawaban kuesioner.</p>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
             {{-- Kartu Hasil Diabetes --}}
-            <div class="p-6 border rounded-xl shadow-sm {{ $dmColor }} transition-colors">
+            <div class="p-6 border rounded-xl shadow-sm {{ $dmColor }} transition-colors" data-aos="fade-right" data-aos-delay="100">
                 <div class="flex items-center justify-between mb-4 border-b border-gray-200/50 pb-4">
                     <h3 class="text-xl font-bold text-gray-900">Diabetes Mellitus</h3>
                     <div class="w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm {{ $dmIconColor }}">
@@ -120,7 +120,7 @@
             </div>
 
             {{-- Kartu Hasil Hipertensi --}}
-            <div class="p-6 border rounded-xl shadow-sm {{ $htColor }} transition-colors">
+            <div class="p-6 border rounded-xl shadow-sm {{ $htColor }} transition-colors" data-aos="fade-left" data-aos-delay="200">
                 <div class="flex items-center justify-between mb-4 border-b border-gray-200/50 pb-4">
                     <h3 class="text-xl font-bold text-gray-900">Hipertensi</h3>
                     <div class="w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm {{ $htIconColor }}">
@@ -141,7 +141,7 @@
         </div>
 
         {{-- Disclaimer Box --}}
-        <div class="p-4 mb-8 text-sm text-gray-700 bg-gray-50 rounded-lg border border-gray-200 shadow-sm" role="alert">
+        <div class="p-4 mb-8 text-sm text-gray-700 bg-gray-50 rounded-lg border border-gray-200 shadow-sm" role="alert" data-aos="fade-up" data-aos-delay="300">
             <div class="flex items-center mb-2">
                 <svg class="w-4 h-4 mr-2 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
                     <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z"/>
@@ -152,10 +152,21 @@
         </div>
 
         {{-- Action Buttons --}}
-        <div class="flex flex-col sm:flex-row justify-center gap-4">
+        <div class="flex flex-col sm:flex-row justify-center gap-4" data-aos="zoom-in" data-aos-delay="400">
             <a href="/" class="w-full sm:w-auto text-gray-900 bg-white hover:bg-gray-100 border border-gray-200 focus:ring-4 focus:outline-none focus:ring-gray-100 font-medium rounded-lg text-sm px-6 py-3 text-center inline-flex justify-center items-center transition-colors">
                 Kembali ke Beranda
             </a>
+            
+            @if($dmStatus == 'Risiko Tinggi' || $htStatus == 'Risiko Tinggi')
+            <a href="/map" class="w-full sm:w-auto text-white bg-red-600 hover:bg-red-700 focus:ring-4 focus:outline-none focus:ring-red-300 font-bold rounded-lg text-sm px-6 py-3 text-center inline-flex justify-center items-center transition-colors shadow-lg animate-bounce">
+                <svg class="w-4 h-4 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+                Cari Faskes Terdekat
+            </a>
+            @endif
+
             <button onclick="window.print()" class="w-full sm:w-auto text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-6 py-3 text-center inline-flex justify-center items-center transition-colors">
                 <svg class="w-4 h-4 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />

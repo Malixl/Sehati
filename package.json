@@ -3,8 +3,13 @@
     "private": true,
     "type": "module",
     "scripts": {
+        "dev": "concurrently \"php artisan serve\" \"npm run vite\"",
+        "vite": "vite",
         "build": "vite build",
-        "dev": "vite"
+        "lint": "vendor/bin/pint",
+        "fresh": "php artisan migrate:fresh --seed",
+        "optimize": "php artisan optimize",
+        "clear": "php artisan optimize:clear"
     },
     "devDependencies": {
         "@tailwindcss/vite": "^4.3.1",
