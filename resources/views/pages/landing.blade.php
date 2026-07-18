@@ -117,7 +117,7 @@
                         </div>
                         <p class="mb-6 font-normal text-gray-600 leading-relaxed">Penyakit kronis yang ditandai dengan tingginya kadar gula darah. Glukosa menumpuk di dalam darah karena tubuh tidak dapat memproduksi atau menggunakan insulin dengan baik.</p>
                         <div class="bg-gray-50 p-4 rounded-lg">
-                            <strong class="block mb-3 font-semibold text-gray-900 flex items-center gap-2">
+                            <strong class="mb-3 font-semibold text-gray-900 flex items-center gap-2">
                                 <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                                 Gejala Umum:
                             </strong>
@@ -139,7 +139,7 @@
                         </div>
                         <p class="mb-6 font-normal text-gray-600 leading-relaxed">Sering disebut tekanan darah tinggi. Kondisi di mana tekanan darah terhadap dinding arteri secara konsisten terlalu tinggi, membebani kerja jantung dan pembuluh darah.</p>
                         <div class="bg-gray-50 p-4 rounded-lg">
-                            <strong class="block mb-3 font-semibold text-gray-900 flex items-center gap-2">
+                            <strong class="mb-3 font-semibold text-gray-900 flex items-center gap-2">
                                 <svg class="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                                 Gejala Umum:
                             </strong>
@@ -165,7 +165,7 @@
 
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-8 relative">
                     {{-- Connecting Line --}}
-                    <div class="hidden md:block absolute top-8 left-[12.5%] right-[12.5%] h-1 bg-gradient-to-r from-blue-100 via-blue-300 to-blue-100 z-0 rounded-full"></div>
+                    <div class="hidden md:block absolute top-8 left-[12.5%] right-[12.5%] h-1 bg-linear-to-r from-blue-100 via-blue-300 to-blue-100 z-0 rounded-full"></div>
 
                     <div data-aos="fade-up" data-aos-delay="100" class="relative z-10 flex flex-col items-center group">
                         <div class="w-16 h-16 rounded-full bg-white text-blue-700 flex items-center justify-center font-bold text-2xl border-4 border-blue-100 mb-6 shadow-md group-hover:bg-blue-700 group-hover:text-white group-hover:border-blue-200 group-hover:scale-110 transition-all duration-300">1</div>

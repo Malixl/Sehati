@@ -21,8 +21,8 @@ class RespondentController extends Controller
         $user = Auth::user();
         
         $filters = $request->only(['search', 'village_id', 'gender']);
-        $sort = $request->get('sort', 'created_at');
-        $direction = $request->get('direction', 'desc');
+        $sort = $request->input('sort', 'created_at');
+        $direction = $request->input('direction', 'desc');
 
         $respondents = $this->respondentService->getPaginatedRespondents($user, $filters, $sort, $direction);
 

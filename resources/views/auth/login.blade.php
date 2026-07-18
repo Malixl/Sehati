@@ -34,7 +34,7 @@
                 
                 @if($errors->any())
                     <div class="bg-red-50 border-l-4 border-red-500 p-4 rounded-md flex items-start" role="alert">
-                        <div class="flex-shrink-0">
+                        <div class="shrink-0">
                             <svg class="h-5 w-5 text-red-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                                 <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
                             </svg>
@@ -59,7 +59,7 @@
                         </div>
                         <input type="email" name="email" id="email" 
                                x-model="emailInput"
-                               class="pl-10 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-xl focus:ring-blue-600 focus:border-blue-600 block w-full p-3 transition-colors @if($errors->any()) border-red-500 focus:border-red-500 focus:ring-red-500 bg-red-50 @endif" 
+                               <class="pl-10 text-sm rounded-xl block w-full p-3 transition-colors {{ $errors->any() ? 'border border-red-500 focus:border-red-500 focus:ring-red-500 bg-red-50 text-red-900' : 'bg-gray-50 border border-gray-300 text-gray-900 focus:ring-blue-600 focus:border-blue-600' }}" 
                                placeholder="nama@email.com" 
                                required 
                                autocomplete="email"
@@ -80,7 +80,7 @@
                             </svg>
                         </div>
                         <input :type="show ? 'text' : 'password'" name="password" id="password" 
-                               class="pl-10 pr-10 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-xl focus:ring-blue-600 focus:border-blue-600 block w-full p-3 transition-colors @if($errors->any()) border-red-500 focus:border-red-500 focus:ring-red-500 bg-red-50 @endif" 
+                               class="pl-10 pr-10 text-sm rounded-xl block w-full p-3 transition-colors {{ $errors->any() ? 'border border-red-500 focus:border-red-500 focus:ring-red-500 bg-red-50 text-red-900' : 'bg-gray-50 border border-gray-300 text-gray-900 focus:ring-blue-600 focus:border-blue-600' }}" 
                                placeholder="••••••••" 
                                required
                                autocomplete="current-password">

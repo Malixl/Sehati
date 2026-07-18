@@ -44,8 +44,8 @@
 <body class="bg-gray-50 text-gray-900 antialiased" style="font-family: 'Inter', sans-serif;">
 
     {{-- Navbar --}}
-    <nav class="bg-white border-b border-gray-200 sticky top-0 z-[1000]">
-        <div class="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8">
+    <nav class="bg-white border-b border-gray-200 sticky top-0 z-1000">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16">
                 <a href="/" class="flex items-center gap-2.5">
                     <div class="w-8 h-8 bg-blue-700 rounded-lg flex items-center justify-center">
