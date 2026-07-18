@@ -103,11 +103,12 @@
                 xaxis: { categories: Object.keys(villageData) }
             }).render();
 
-            const severityColorMap = {
-            'Risiko Rendah': '#10B981',   // Green
-            'Risiko Sedang': '#FBBF24',   // Yellow
+        const severityColorMap = {
+            'Risiko Rendah': '#10B981',   // Hijau
+            'Risiko Sedang': '#FBBF24',   // Kuning
             'Risiko Tinggi': '#F97316',   // Orange
-            'Kritis': '#EF4444',          // Red
+            'Terdiagnosa': '#EF4444',     // Merah
+            'Kritis': '#EF4444',          // Merah (fallback)
             'Belum ada data': '#6B7280'   // Gray
         };
 

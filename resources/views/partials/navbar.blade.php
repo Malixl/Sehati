@@ -1,6 +1,6 @@
 {{-- Navbar Partial --}}
-<div x-data="{ timModalOpen: false }">
-    <nav class="bg-white border-b border-gray-200 sticky top-0 z-40">
+<div x-data="{ timModalOpen: false }" class="sticky top-0 z-50">
+    <nav class="bg-white/95 backdrop-blur-md border-b border-gray-200">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16">
                 {{-- Logo --}}
@@ -21,17 +21,21 @@
                         class="px-3 py-2 text-sm font-medium rounded-lg text-gray-700 hover:text-blue-700 hover:bg-blue-50 transition-colors">
                         Beranda
                     </a>
-                    <a href="#tentang"
+                    <a href="/#tentang"
                         class="px-3 py-2 text-sm font-medium rounded-lg text-gray-700 hover:text-blue-700 hover:bg-blue-50 transition-colors">
                         Tentang
                     </a>
-                    <a href="#tim"
+                    <a href="/#tim"
                         class="px-3 py-2 text-sm font-medium rounded-lg text-gray-700 hover:text-blue-700 hover:bg-blue-50 transition-colors">
                         Tim
                     </a>
-                    <a href="#faq"
+                    <a href="/#faq"
                         class="px-3 py-2 text-sm font-medium rounded-lg text-gray-700 hover:text-blue-700 hover:bg-blue-50 transition-colors">
                         FAQ
+                    </a>
+                    <a href="{{ route('screening.history') }}"
+                        class="px-3 py-2 text-sm font-medium rounded-lg text-gray-700 hover:text-blue-700 hover:bg-blue-50 transition-colors {{ request()->routeIs('screening.history') ? 'text-blue-700 bg-blue-50' : '' }}">
+                        Riwayat
                     </a>
                 </div>
 
@@ -60,12 +64,14 @@
                 <div class="flex flex-col gap-1 pt-2 border-t border-gray-100">
                     <a href="/"
                         class="px-3 py-2.5 text-sm font-medium rounded-lg text-gray-700 hover:bg-gray-50">Beranda</a>
-                    <a href="#tentang"
+                    <a href="/#tentang"
                         class="px-3 py-2.5 text-sm font-medium rounded-lg text-gray-700 hover:bg-gray-50">Tentang</a>
-                    <a href="#tim"
+                    <a href="/#tim"
                         class="px-3 py-2.5 text-sm font-medium rounded-lg text-gray-700 hover:bg-gray-50">Tim</a>
-                    <a href="#faq"
+                    <a href="/#faq"
                         class="px-3 py-2.5 text-sm font-medium rounded-lg text-gray-700 hover:bg-gray-50">FAQ</a>
+                    <a href="{{ route('screening.history') }}"
+                        class="px-3 py-2.5 text-sm font-medium rounded-lg text-gray-700 hover:bg-gray-50 {{ request()->routeIs('screening.history') ? 'text-blue-700 bg-blue-50' : '' }}">Riwayat</a>
                     <a href="{{ route('login') }}"
                         class="mt-4 text-center text-sm font-semibold text-blue-700 bg-blue-50 border border-blue-200 hover:bg-blue-600 hover:text-white rounded-lg px-4 py-2.5 transition-colors">
                         Login Petugas

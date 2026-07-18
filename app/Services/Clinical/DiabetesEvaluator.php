@@ -34,8 +34,8 @@ class DiabetesEvaluator
             );
 
             return new EvaluationResult(
-                status: 'Sudah Terdiagnosis',
-                severity: 'diagnosed',
+                status: 'Terdiagnosa',
+                severity: 'high',
                 message: 'Anda sudah pernah didiagnosis Diabetes Mellitus oleh tenaga medis. Skrining risiko tidak berlaku — yang diperlukan adalah pemantauan dan pengelolaan berkelanjutan.',
                 action: 'Lanjutkan kontrol rutin ke fasilitas kesehatan. Pantau gula darah secara berkala.',
                 explanations: $explanations,

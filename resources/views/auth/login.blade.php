@@ -59,7 +59,7 @@
                         </div>
                         <input type="email" name="email" id="email" 
                                x-model="emailInput"
-                               <class="pl-10 text-sm rounded-xl block w-full p-3 transition-colors {{ $errors->any() ? 'border border-red-500 focus:border-red-500 focus:ring-red-500 bg-red-50 text-red-900' : 'bg-gray-50 border border-gray-300 text-gray-900 focus:ring-blue-600 focus:border-blue-600' }}" 
+                               class="pl-10 text-sm rounded-xl block w-full p-3 transition-colors {{ $errors->any() ? 'border border-red-500 focus:border-red-500 focus:ring-red-500 bg-red-50 text-red-900' : 'bg-gray-50 border border-gray-300 text-gray-900 focus:ring-blue-600 focus:border-blue-600' }}" 
                                placeholder="nama@email.com" 
                                required 
                                autocomplete="email"

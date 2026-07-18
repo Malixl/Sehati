@@ -98,13 +98,16 @@
                     {{-- Desa Domisili & Posyandu --}}
                     <div x-data="{
                             selectedVillage: '',
+                            selectedHealthPost: '',
                             villages: {{ Js::from($villages) }},
                             get healthPosts() {
                                 if (!this.selectedVillage) return [];
                                 const village = this.villages.find(v => v.id == this.selectedVillage);
                                 return village ? village.health_posts : [];
                             }
-                        }" class="space-y-4">
+                        }" 
+                        x-init="$watch('selectedVillage', value => selectedHealthPost = '')"
+                        class="space-y-4">
                         <div>
                             <label for="village_id" class="block mb-2 text-sm font-medium text-gray-900">Desa Domisili <span
                                     class="text-red-500">*</span></label>
@@ -121,7 +124,7 @@
                         <div>
                             <label for="health_post_id" class="block mb-2 text-sm font-medium text-gray-900">Puskesmas /
                                 Posyandu <span class="text-red-500">*</span></label>
-                            <select id="health_post_id" name="health_post_id"
+                            <select id="health_post_id" name="health_post_id" x-model="selectedHealthPost"
                                 class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
                                 required :disabled="!selectedVillage">
                                 <option value="">Pilih Posyandu</option>

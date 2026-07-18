@@ -129,7 +129,11 @@
                     return;
                 }
                 this.isLoading = true;
-                setTimeout(() => this.$refs.form.submit(), 2500);
+                document.body.style.overflow = 'hidden';
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                setTimeout(() => {
+                    this.$refs.form.submit();
+                }, 2500);
             }
         }"
         data-aos="fade-up">

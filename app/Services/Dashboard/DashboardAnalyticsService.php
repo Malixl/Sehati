@@ -194,7 +194,7 @@ class DashboardAnalyticsService
         $cacheKey = "severity_{$type}_user_{$user->id}";
 
         return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($user, $type) {
-            $column = $type === 'dm' ? 'dm_severity' : 'ht_severity';
+            $column = $type === 'dm' ? 'dm_status' : 'ht_status';
             
             $data = Screening::filterByRole($user)
                 ->select($column, DB::raw('COUNT(id) as total'))
@@ -202,18 +202,10 @@ class DashboardAnalyticsService
                 ->groupBy($column)
                 ->get();
 
-            $labelsMap = [
-                'low' => 'Risiko Rendah',
-                'moderate' => 'Risiko Sedang',
-                'high' => 'Risiko Tinggi',
-                'critical' => 'Kritis',
-            ];
-
             $result = [];
 
             foreach ($data as $item) {
-                $rawLevel = strtolower($item->$column);
-                $label = $labelsMap[$rawLevel] ?? ucfirst($rawLevel);
+                $label = $item->$column; // Already 'Risiko Tinggi', 'Sudah Terdiagnosis', etc
                 
                 if ((int) $item->total > 0) {
                     $result[$label] = (int) $item->total;

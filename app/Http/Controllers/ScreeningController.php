@@ -202,4 +202,21 @@ class ScreeningController extends Controller
         // we might need to adapt result.blade.php to read from the Screening Eloquent object directly.
         return view('pages.result', compact('screening'));
     }
+
+    public function history(Request $request)
+    {
+        $token = $request->cookie('device_token');
+        $device = Device::where('token', $token)->first();
+
+        if (!$device) {
+            $screenings = collect();
+        } else {
+            $screenings = Screening::with('respondent')
+                ->where('device_id', $device->id)
+                ->orderBy('created_at', 'desc')
+                ->get();
+        }
+
+        return view('pages.history', compact('screenings'));
+    }
 }

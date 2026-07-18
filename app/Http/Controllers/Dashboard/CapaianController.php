@@ -45,13 +45,13 @@ class CapaianController extends Controller
             $htCountQuery = clone $respondentQuery;
             $htCount = $htCountQuery->whereHas('screenings', function($sq) use ($selectedPeriodId) {
                 if ($selectedPeriodId) $sq->where('screening_period_id', $selectedPeriodId);
-                $sq->whereIn('ht_status', ['Risiko Tinggi', 'Sudah Terdiagnosis']);
+                $sq->whereIn('ht_status', ['Risiko Tinggi', 'Terdiagnosa']);
             })->count();
 
             $dmCountQuery = clone $respondentQuery;
             $dmCount = $dmCountQuery->whereHas('screenings', function($sq) use ($selectedPeriodId) {
                 if ($selectedPeriodId) $sq->where('screening_period_id', $selectedPeriodId);
-                $sq->whereIn('dm_status', ['Risiko Tinggi', 'Sudah Terdiagnosis']);
+                $sq->whereIn('dm_status', ['Risiko Tinggi', 'Terdiagnosa']);
             })->count();
 
             $village->screened_count = $screenedCount;
@@ -117,11 +117,11 @@ class CapaianController extends Controller
             })->count();
             $village->ht_count = (clone $respondentQuery)->whereHas('screenings', function($sq) use ($selectedPeriodId) {
                 if ($selectedPeriodId) $sq->where('screening_period_id', $selectedPeriodId);
-                $sq->whereIn('ht_status', ['Risiko Tinggi', 'Sudah Terdiagnosis']);
+                $sq->whereIn('ht_status', ['Risiko Tinggi', 'Terdiagnosa']);
             })->count();
             $village->dm_count = (clone $respondentQuery)->whereHas('screenings', function($sq) use ($selectedPeriodId) {
                 if ($selectedPeriodId) $sq->where('screening_period_id', $selectedPeriodId);
-                $sq->whereIn('dm_status', ['Risiko Tinggi', 'Sudah Terdiagnosis']);
+                $sq->whereIn('dm_status', ['Risiko Tinggi', 'Terdiagnosa']);
             })->count();
             return $village;
         });

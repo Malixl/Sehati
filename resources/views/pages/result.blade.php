@@ -3,113 +3,128 @@
 @section('title', 'Hasil Skrining - Sehati')
 
 @php
-// ══════════════════════════════════════════════════════════════
-// SEHATI RULE ENGINE v2 — GATEC (Service Architecture)
-// Guideline-Anchored Tiered Evidence Classification
-//
-// Seluruh logika klinis telah dipindahkan ke:
-// app/Services/Clinical/GatecRuleEngine.php
-//
-// Blade ini hanya bertanggung jawab untuk PRESENTASI UI.
-// ══════════════════════════════════════════════════════════════
+    // ══════════════════════════════════════════════════════════════
+    // SEHATI RULE ENGINE v2 — GATEC (Service Architecture)
+    // Guideline-Anchored Tiered Evidence Classification
+    //
+    // Seluruh logika klinis telah dipindahkan ke:
+    // app/Services/Clinical/GatecRuleEngine.php
+    //
+    // Blade ini hanya bertanggung jawab untuk PRESENTASI UI.
+    // ══════════════════════════════════════════════════════════════
 
-use App\Services\Clinical\GatecRuleEngine;
-use App\Services\Clinical\DTO\PatientData;
+    use App\Services\Clinical\GatecRuleEngine;
+    use App\Services\Clinical\DTO\PatientData;
 
-// ─── 1. DATA PASIEN & SCREENING ─────────────────────────────────
-$patient = $screening->respondent;
+    // ─── 1. DATA PASIEN & SCREENING ─────────────────────────────────
+    $patient = $screening->respondent;
 
-// Data Pasien (untuk display)
-$gender = $patient->gender;
-$age = \Carbon\Carbon::parse($patient->birthdate)->age;
-$c_tekanan_sistolik = $screening->c_sistolik;
-$c_tekanan_diastolik = $screening->c_diastolik;
-$c_gula = $screening->c_gula;
-$c_kolesterol_lab = $screening->c_kolesterol;
-$c_asam_urat = $screening->c_asam_urat;
-$c_lingkar_perut = $screening->c_perut;
-$c_merokok = $screening->c_merokok;
-$c_berat = $screening->c_berat;
-$c_tinggi = $screening->c_tinggi;
+    // Data Pasien (untuk display)
+    $gender = $patient->gender;
+    $age = \Carbon\Carbon::parse($patient->birthdate)->age;
+    $c_tekanan_sistolik = $screening->c_sistolik;
+    $c_tekanan_diastolik = $screening->c_diastolik;
+    $c_gula = $screening->c_gula;
+    $c_kolesterol_lab = $screening->c_kolesterol;
+    $c_asam_urat = $screening->c_asam_urat;
+    $c_lingkar_perut = $screening->c_perut;
+    $c_merokok = $screening->c_merokok;
+    $c_berat = $screening->c_berat;
+    $c_tinggi = $screening->c_tinggi;
 
-// Decode Evidence & Decision
-$decision = json_decode($screening->decision_explanation, true);
+    // Decode Evidence & Decision
+    $decision = json_decode($screening->decision_explanation, true);
 
-// Hasil Evaluasi DM
-$dmStatus = $screening->dm_status;
-$dmSeverity = $screening->dm_severity;
-$dmMessage = $decision['dm_msg'] ?? '';
-$dmAction = $decision['dm_action'] ?? '';
+    // Hasil Evaluasi DM
+    $dmStatus = $screening->dm_status;
+    $dmSeverity = $screening->dm_severity;
+    $dmMessage = $decision['dm_msg'] ?? '';
+    $dmAction = $decision['dm_action'] ?? '';
 
-// Hasil Evaluasi HT
-$htStatus = $screening->ht_status;
-$htSeverity = $screening->ht_severity;
-$htMessage = $decision['ht_msg'] ?? '';
-$htAction = $decision['ht_action'] ?? '';
+    // Hasil Evaluasi HT
+    $htStatus = $screening->ht_status;
+    $htSeverity = $screening->ht_severity;
+    $htMessage = $decision['ht_msg'] ?? '';
+    $htAction = $decision['ht_action'] ?? '';
 
-// Flags
-$needsUrgentReferral = $screening->recommendation_level === 'emergency';
-$needsReferral = in_array($screening->recommendation_level, ['emergency', 'visit_puskesmas', 'visit_posyandu']);
-$hasCardiometabolicDouble = ($dmSeverity === 'high' || $dmSeverity === 'critical') && ($htSeverity === 'high' || $htSeverity === 'critical');
+    // Flags
+    $needsUrgentReferral = $screening->recommendation_level === 'emergency';
+    $needsReferral = in_array($screening->recommendation_level, ['emergency', 'visit_puskesmas', 'visit_posyandu']);
+    $hasCardiometabolicDouble = ($dmSeverity === 'high' || $dmSeverity === 'critical') && ($htSeverity === 'high' || $htSeverity === 'critical');
 
-// Clinical Findings
-$findings = $decision['findings'] ?? [];
+    // Clinical Findings
+    $findings = $decision['findings'] ?? [];
 
-// Evidence (untuk display)
-$imtLevel = $decision['evidence']['imtLevel'] ?? 'normal';
-$bpLevel = $decision['evidence']['bpLevel'] ?? 'normal';
-$gdsLevel = $decision['evidence']['gdsLevel'] ?? 'normal';
-$wcLevel = $decision['evidence']['wcLevel'] ?? 'normal';
+    // Evidence (untuk display)
+    $imtLevel = $decision['evidence']['imtLevel'] ?? 'normal';
+    $bpLevel = $decision['evidence']['bpLevel'] ?? 'normal';
+    $gdsLevel = $decision['evidence']['gdsLevel'] ?? 'normal';
+    $wcLevel = $decision['evidence']['wcLevel'] ?? 'normal';
 
-// Hitung IMT untuk badge
-$imt = $c_tinggi > 0 ? $c_berat / (($c_tinggi/100) * ($c_tinggi/100)) : 0;
+    // Hitung IMT untuk badge
+    $imt = $c_tinggi > 0 ? $c_berat / (($c_tinggi / 100) * ($c_tinggi / 100)) : 0;
 
-// ─── 2. UI STYLING (Presentasi — bukan business logic) ───────
+    // ─── 2. UI STYLING (Presentasi — bukan business logic) ───────
 
-$severityStyles = [
-'low' => [
-'color' => 'bg-green-50 border-green-200',
-'text' => 'text-green-700',
-'icon' => 'bg-green-100 text-green-600',
-'badge' => 'bg-green-100 text-green-700',
-'label' => '🟢',
-],
-'moderate' => [
-'color' => 'bg-yellow-50 border-yellow-200',
-'text' => 'text-yellow-800',
-'icon' => 'bg-yellow-100 text-yellow-600',
-'badge' => 'bg-yellow-100 text-yellow-800',
-'label' => '🟡',
-],
-'high' => [
-'color' => 'bg-red-50 border-red-200',
-'text' => 'text-red-700',
-'icon' => 'bg-red-100 text-red-600',
-'badge' => 'bg-red-100 text-red-700',
-'label' => '🔴',
-],
-'critical' => [
-'color' => 'bg-red-100 border-red-300',
-'text' => 'text-red-800',
-'icon' => 'bg-red-200 text-red-700',
-'badge' => 'bg-red-200 text-red-800',
-'label' => '🔴',
-],
-];
+    $getStatusStyle = function ($status) {
+        $normalized = strtolower($status);
+        if (str_contains($normalized, 'rendah') || str_contains($normalized, 'low')) {
+            return [
+                'color' => 'bg-green-50 border-green-200',
+                'text' => 'text-green-700',
+                'icon' => 'bg-green-100 text-green-600',
+                'badge' => 'bg-green-100 text-green-700',
+                'label' => '🟢',
+            ];
+        } elseif (str_contains($normalized, 'sedang') || str_contains($normalized, 'moderate')) {
+            return [
+                'color' => 'bg-yellow-50 border-yellow-200',
+                'text' => 'text-yellow-800',
+                'icon' => 'bg-yellow-100 text-yellow-600',
+                'badge' => 'bg-yellow-100 text-yellow-800',
+                'label' => '🟡',
+            ];
+        } elseif (str_contains($normalized, 'tinggi') || str_contains($normalized, 'high')) {
+            return [
+                'color' => 'bg-orange-50 border-orange-200',
+                'text' => 'text-orange-700',
+                'icon' => 'bg-orange-100 text-orange-600',
+                'badge' => 'bg-orange-100 text-orange-700',
+                'label' => '🟠',
+            ];
+        } elseif (str_contains($normalized, 'terdiagnosa') || str_contains($normalized, 'kritis') || str_contains($normalized, 'critical')) {
+            return [
+                'color' => 'bg-red-50 border-red-200',
+                'text' => 'text-red-700',
+                'icon' => 'bg-red-100 text-red-600',
+                'badge' => 'bg-red-100 text-red-700',
+                'label' => '🔴',
+            ];
+        }
 
-$dmStyle = $severityStyles[$dmSeverity];
-$htStyle = $severityStyles[$htSeverity];
+        // Fallback
+        return [
+            'color' => 'bg-gray-50 border-gray-200',
+            'text' => 'text-gray-700',
+            'icon' => 'bg-gray-100 text-gray-600',
+            'badge' => 'bg-gray-100 text-gray-700',
+            'label' => '⚪',
+        ];
+    };
 
-// BP classification label untuk display
-$bpDisplayLabels = [
-'NORMAL' => 'Normal',
-'ELEVATED' => 'Elevated',
-'DERAJAT_1' => 'HT Derajat 1',
-'DERAJAT_2' => 'HT Derajat 2',
-'DERAJAT_3' => 'HT Derajat 3',
-'KRISIS' => 'Krisis HT',
-];
-$bpDisplayLabel = $bpDisplayLabels[$bpLevel] ?? $bpLevel;
+    $dmStyle = $getStatusStyle($dmStatus);
+    $htStyle = $getStatusStyle($htStatus);
+
+    // BP classification label untuk display
+    $bpDisplayLabels = [
+        'NORMAL' => 'Normal',
+        'ELEVATED' => 'Elevated',
+        'DERAJAT_1' => 'HT Derajat 1',
+        'DERAJAT_2' => 'HT Derajat 2',
+        'DERAJAT_3' => 'HT Derajat 3',
+        'KRISIS' => 'Krisis HT',
+    ];
+    $bpDisplayLabel = $bpDisplayLabels[$bpLevel] ?? $bpLevel;
 @endphp
 
 @section('content')
@@ -132,7 +147,7 @@ $bpDisplayLabel = $bpDisplayLabels[$bpLevel] ?? $bpLevel;
         </div>
     </nav>
 
-    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-32">
 
         {{-- Header --}}
         <div class="text-center mb-10" data-aos="fade-down">
@@ -243,13 +258,13 @@ $bpDisplayLabel = $bpDisplayLabels[$bpLevel] ?? $bpLevel;
                     @foreach($findings as $finding)
                         @php
                             $findingColors = [
-                                'critical' => 'bg-red-50 border-red-200',
-                                'high' => 'bg-red-50 border-red-100',
-                                'moderate' => 'bg-yellow-50 border-yellow-100',
-                                'info' => 'bg-blue-50 border-blue-100',
-                                'good' => 'bg-green-50 border-green-100',
+                                'critical' => 'bg-red-50 border-red-200 text-red-800',
+                                'high' => 'bg-orange-50 border-orange-200 text-orange-800',
+                                'moderate' => 'bg-yellow-50 border-yellow-200 text-yellow-800',
+                                'info' => 'bg-blue-50 border-blue-200 text-blue-800',
+                                'good' => 'bg-green-50 border-green-200 text-green-800',
                             ];
-                            $findingColor = $findingColors[$finding['severity']] ?? 'bg-gray-50 border-gray-100';
+                            $findingColor = $findingColors[$finding['severity']] ?? 'bg-gray-50 border-gray-100 text-gray-800';
                         @endphp
                         <li class="rounded-lg p-3 border {{ $findingColor }}">
                             <span class="block font-semibold text-gray-900 text-sm mb-1">{{ $finding['title'] }}</span>
@@ -362,65 +377,48 @@ $bpDisplayLabel = $bpDisplayLabels[$bpLevel] ?? $bpLevel;
                 menegakkan diagnosis penyakit melalui pemeriksaan klinis dan laboratorium.</p>
         </div>
 
-        {{-- Action Buttons --}}
-        <div class="flex flex-col sm:flex-row justify-center gap-4 print:hidden">
-            <a href="/"
-                onclick="return confirm('apakah anda yakin keluar? data belum disimpan silahkan simpan dulu datanya.')"
-                class="w-full sm:w-auto text-gray-900 bg-white hover:bg-gray-100 border border-gray-200 focus:ring-4 focus:outline-none focus:ring-gray-100 font-medium rounded-lg text-sm px-6 py-3 text-center inline-flex justify-center items-center transition-colors">
-                Kembali ke Beranda
-            </a>
+    </div>
 
-            <button type="button"
-                class="w-full sm:w-auto text-white bg-green-600 hover:bg-green-700 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-6 py-3 text-center inline-flex justify-center items-center transition-colors shadow-sm">
-                <svg class="w-4 h-4 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                    stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
-                </svg>
-                Simpan Data
-            </button>
+    {{-- Action Buttons (Moved outside main container for reliable fixed positioning) --}}
+    <div class="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-md border-t border-gray-200 shadow-[0_-10px_15px_-3px_rgba(0,0,0,0.1)] print:hidden"
+        style="position: fixed !important;">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <div class="flex flex-col sm:flex-row justify-center gap-4">
+                @php
+                    $source = request()->query('source');
+                    $backUrl = $source === 'history' ? route('screening.history') : '/';
+                    $backText = $source === 'history' ? 'Kembali ke Riwayat' : 'Kembali ke Beranda';
+                @endphp
+                <a href="{{ $backUrl }}"
+                    class="w-full sm:w-auto text-gray-900 bg-white hover:bg-gray-100 border border-gray-200 focus:ring-4 focus:outline-none focus:ring-gray-100 font-medium rounded-lg text-sm px-6 py-3 text-center inline-flex justify-center items-center transition-colors">
+                    {{ $backText }}
+                </a>
 
-            @if($needsUrgentReferral || $needsReferral)
-                <a href="/map"
-                    class="w-full sm:w-auto text-white {{ $needsUrgentReferral ? 'bg-red-600 hover:bg-red-700 focus:ring-red-300 animate-bounce' : 'bg-red-600 hover:bg-red-700 focus:ring-red-300' }} focus:ring-4 focus:outline-none font-bold rounded-lg text-sm px-6 py-3 text-center inline-flex justify-center items-center transition-colors shadow-lg">
+                @if($needsUrgentReferral || $needsReferral)
+                    <a href="/map"
+                        class="w-full sm:w-auto text-white {{ $needsUrgentReferral ? 'bg-red-600 hover:bg-red-700 focus:ring-red-300 animate-bounce' : 'bg-red-600 hover:bg-red-700 focus:ring-red-300' }} focus:ring-4 focus:outline-none font-bold rounded-lg text-sm px-6 py-3 text-center inline-flex justify-center items-center transition-colors shadow-lg">
+                        <svg class="w-4 h-4 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
+                        Cari Faskes Terdekat
+                    </a>
+                @endif
+
+                <button onclick="window.print()"
+                    class="w-full sm:w-auto text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-6 py-3 text-center inline-flex justify-center items-center transition-colors">
                     <svg class="w-4 h-4 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                         stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                            d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
                     </svg>
-                    Cari Faskes Terdekat
-                </a>
-            @endif
-
-            <button onclick="window.print()"
-                class="w-full sm:w-auto text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-6 py-3 text-center inline-flex justify-center items-center transition-colors">
-                <svg class="w-4 h-4 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                    stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
-                </svg>
-                Cetak Laporan
-            </button>
+                    Cetak Laporan
+                </button>
+            </div>
         </div>
-
     </div>
 
-    @push('scripts')
-        <script>
-            // Mencegah user kembali ke halaman sebelumnya (tombol back browser) tanpa peringatan
-            history.pushState(null, null, location.href);
-            window.onpopstate = function () {
-                const confirmLeave = confirm('apakah anda yakin keluar? data belum disimpan silahkan simpan dulu datanya.');
-                if (!confirmLeave) {
-                    // User batal keluar, kembalikan state
-                    history.pushState(null, null, location.href);
-                } else {
-                    // User tetap keluar, biarkan history mundur
-                    history.go(-1);
-                }
-            };
-        </script>
-    @endpush
 @endsection

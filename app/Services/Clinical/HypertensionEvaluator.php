@@ -50,7 +50,7 @@ class HypertensionEvaluator
             }
 
             return new EvaluationResult(
-                status: 'Sudah Terdiagnosis',
+                status: 'Terdiagnosa',
                 severity: $htSeverity,
                 message: $htMessage,
                 action: $htAction,

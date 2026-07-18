@@ -136,10 +136,10 @@
                     @endif
                 </td>
                 <td class="px-4 py-3 whitespace-nowrap">
-                    <x-dashboard.severity-badge :level="$screening->dm_severity" />
+                    <x-dashboard.severity-badge :level="$screening->dm_severity" :label="$screening->dm_status" />
                 </td>
                 <td class="px-4 py-3 whitespace-nowrap">
-                    <x-dashboard.severity-badge :level="$screening->ht_severity" />
+                    <x-dashboard.severity-badge :level="$screening->ht_severity" :label="$screening->ht_status" />
                 </td>
                 <td class="px-4 py-3">
                     @php

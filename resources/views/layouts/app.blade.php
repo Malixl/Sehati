@@ -29,7 +29,7 @@
     <style>[x-cloak] { display: none !important; }</style>
 </head>
 
-<body class="bg-gray-50 text-gray-900 antialiased min-h-screen flex flex-col page-fade-in @yield('body-class')">
+<body class="bg-gray-50 text-gray-900 antialiased min-h-screen flex flex-col @yield('body-class')">
 
     @yield('content')
 

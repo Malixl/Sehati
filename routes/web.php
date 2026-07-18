@@ -15,6 +15,7 @@ Route::middleware(['device'])->group(function () {
     Route::get('/questionnaire', [\App\Http\Controllers\ScreeningController::class, 'showQuestionnaireForm'])->name('screening.questionnaire');
     Route::post('/screening', [\App\Http\Controllers\ScreeningController::class, 'store'])->name('screening.store');
     Route::get('/result/{id}', [\App\Http\Controllers\ScreeningController::class, 'show'])->name('screening.result');
+    Route::get('/riwayat', [\App\Http\Controllers\ScreeningController::class, 'history'])->name('screening.history');
 });
 
 // Map Page (Faskes Terdekat)

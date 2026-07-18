@@ -1,16 +1,22 @@
-@props(['level'])
+@props(['level' => null, 'label' => null])
 
 @php
-    $config = [
-        'low' => ['color' => 'emerald', 'label' => 'Risiko Rendah'],
-        'moderate' => ['color' => 'yellow', 'label' => 'Risiko Sedang'],
-        'high' => ['color' => 'orange', 'label' => 'Risiko Tinggi'],
-        'critical' => ['color' => 'red', 'label' => 'Kritis'],
-    ];
-
-    $conf = $config[$level] ?? ['color' => 'gray', 'label' => 'Tidak Diketahui'];
-    $color = $conf['color'];
-    $label = $conf['label'];
+    $displayText = $label ?? $level ?? 'Tidak Diketahui';
+    
+    // Fallback normalization just in case
+    $normalized = strtolower($displayText);
+    
+    if (str_contains($normalized, 'rendah') || str_contains($normalized, 'low')) {
+        $color = 'emerald';
+    } elseif (str_contains($normalized, 'sedang') || str_contains($normalized, 'moderate')) {
+        $color = 'yellow';
+    } elseif (str_contains($normalized, 'tinggi') || str_contains($normalized, 'high')) {
+        $color = 'orange';
+    } elseif (str_contains($normalized, 'terdiagnosa') || str_contains($normalized, 'kritis') || str_contains($normalized, 'critical')) {
+        $color = 'red';
+    } else {
+        $color = 'gray';
+    }
     
     // Tailwind classes mapping to avoid purge issues
     $classes = "bg-{$color}-100 text-{$color}-800";
@@ -20,5 +26,5 @@
 @endphp
 
 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $classes }}">
-    {{ $label }}
+    {{ $displayText }}
 </span>
