@@ -62,7 +62,7 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                             </svg>
                         </div>
-                        <h3 class="mb-3 text-xl font-bold tracking-tight text-gray-900">Deteksi Dini</h3>
+                        <h3 class="mb-3 txext-xl font-bold tracking-tight text-gray-900">Deteksi Dini</h3>
                         <p class="font-normal text-gray-500 text-sm">Mengetahui risiko lebih awal memberi Anda peluang terbaik untuk pencegahan yang efektif.</p>
                     </div>
 
@@ -81,7 +81,7 @@
                             <svg class="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
                             </svg>
-                        </div>
+                        </div>x
                         <h3 class="mb-3 text-xl font-bold tracking-tight text-gray-900">Kesadaran Risiko</h3>
                         <p class="font-normal text-gray-500 text-sm">Meningkatkan kesadaran akan kondisi kesehatan Anda dan potensi risiko di masa depan.</p>
                     </div>
@@ -239,6 +239,42 @@
             </div>
         </section>
 
+        {{-- Tim Peneliti Section --}}
+        <section id="tim" class="bg-gray-50 py-20">
+            <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div data-aos="fade-up" class="text-center mb-12">
+                    <h2 class="mb-4 text-3xl font-extrabold tracking-tight text-gray-900">Tim Peneliti</h2>
+                    <p class="text-gray-500 max-w-2xl mx-auto">Tim Risbinakes Poltekkes Kemenkes Gorontalo Jurusan Keperawatan</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    {{-- Member 1 --}}
+                    <div data-aos="fade-up" data-aos-delay="100" class="bg-white rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow p-6 text-center">
+                        <img src="{{ asset('img/Lusiane-Adam.jpeg') }}" alt="Lusiane Adam" class="w-24 h-24 mx-auto mb-4 rounded-full object-cover border-2 border-blue-100 shadow-sm" style="object-position: 50% 20%;">
+                        <h4 class="font-bold text-gray-900 text-lg mb-1">Lusiane Adam</h4>
+                        <p class="text-sm text-gray-500 mb-3">S.Kep, M.Kes</p>
+                        <span class="inline-block text-xs font-medium text-blue-700 bg-blue-50 rounded-full px-3 py-1">Peneliti Utama</span>
+                    </div>
+
+                    {{-- Member 2 --}}
+                    <div data-aos="fade-up" data-aos-delay="200" class="bg-white rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow p-6 text-center">
+                        <img src="{{ asset('img/Ahmad-Aswad.jpeg') }}" alt="Ahmad Aswad" class="w-24 h-24 mx-auto mb-4 rounded-full object-cover border-2 border-green-100 shadow-sm" style="object-position: 50% 20%;">
+                        <h4 class="font-bold text-gray-900 text-lg mb-1">Ahmad Aswad</h4>
+                        <p class="text-sm text-gray-500 mb-3">S.Kep, Ns, MPH</p>
+                        <span class="inline-block text-xs font-medium text-green-700 bg-green-50 rounded-full px-3 py-1">Anggota Peneliti</span>
+                    </div>
+
+                    {{-- Member 3 --}}
+                    <div data-aos="fade-up" data-aos-delay="300" class="bg-white rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow p-6 text-center">
+                        <img src="{{ asset('img/Ruliyani-Manumba.jfif') }}" alt="Ruliyani Manumba" class="w-24 h-24 mx-auto mb-4 rounded-full object-cover border-2 border-purple-100 shadow-sm" style="object-position: 50% 15%;">
+                        <h4 class="font-bold text-gray-900 text-lg mb-1">Ruliyani Manumba</h4>
+                        <p class="text-sm text-gray-500 mb-3">S.Kep, Ns, M.Kep, Sp.Kep.Jiwa</p>
+                        <span class="inline-block text-xs font-medium text-purple-700 bg-purple-50 rounded-full px-3 py-1">Anggota Peneliti</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
         {{-- FAQ Section --}}
         <section id="faq" class="bg-white py-20">
             <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -252,7 +288,7 @@
                             ['q' => 'Apakah skrining ini bisa dijadikan diagnosis medis pasti?', 'a' => 'Tidak. Skrining ini hanya bertujuan untuk mendeteksi tingkat risiko awal. Hasil skrining tidak menggantikan diagnosis resmi dari dokter. Anda disarankan mengunjungi fasilitas kesehatan terdekat jika mendapatkan hasil risiko tinggi.'],
                             ['q' => 'Berapa lama waktu yang dibutuhkan?', 'a' => 'Proses skrining membutuhkan waktu sekitar 5-10 menit untuk mengisi seluruh kuesioner.'],
                             ['q' => 'Apakah data saya aman?', 'a' => 'Ya. Data Anda dijamin kerahasiaannya dan tidak dipublikasikan. Data hanya dianalisis secara kolektif untuk keperluan penelitian akademik tanpa mengaitkannya dengan identitas pribadi.'],
-                            ['q' => 'Siapa yang sebaiknya mengikuti skrining ini?', 'a' => 'Setiap individu dewasa (di atas 18 tahun), khususnya mereka yang memiliki riwayat keluarga dengan penyakit diabetes atau hipertensi, jarang berolahraga, atau perokok aktif.'],
+                            ['q' => 'Siapa yang sebaiknya mengikuti skrining ini?', 'a' => 'Setiap individu usia produktif, khususnya mereka yang memiliki riwayat keluarga dengan penyakit diabetes atau hipertensi, jarang berolahraga, atau perokok aktif.'],
                         ]
                     ])
                 </div>
@@ -260,7 +296,7 @@
         </section>
 
         {{-- CTA Section --}}
-        <section class="bg-blue-900 text-white py-20 relative overflow-hidden">
+        <!-- <section class="bg-blue-900 text-white py-20 relative overflow-hidden">
             {{-- Background decorative shapes --}}
             <div class="absolute top-0 left-0 w-64 h-64 bg-blue-800 rounded-full mix-blend-multiply filter blur-3xl opacity-50 animate-blob"></div>
             <div class="absolute top-0 right-0 w-64 h-64 bg-blue-600 rounded-full mix-blend-multiply filter blur-3xl opacity-50 animate-blob animation-delay-2000"></div>
@@ -276,7 +312,7 @@
                     </a>
                 </div>
             </div>
-        </section>
+        </section> -->
 
     </main>
 

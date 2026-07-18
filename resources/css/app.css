@@ -1,6 +1,8 @@
 @import 'tailwindcss';
 @plugin "flowbite/plugin";
 
+[x-cloak] { display: none !important; }
+
 @source '../views';
 @source '../../app';
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';

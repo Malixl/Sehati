@@ -1,0 +1,66 @@
+name: 🚀 Deploy to InfinityFree
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    name: Build & Deploy via FTP
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Checkout repo
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      # 2. Setup PHP & install Composer dependencies
+      #    InfinityFree tidak punya Composer/CLI,
+      #    jadi vendor/ harus di-build di CI lalu di-upload
+      - name: 🐘 Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+
+      - name: 📦 Install Composer dependencies
+        run: composer install --no-dev --optimize-autoloader --no-interaction
+
+      # 3. Setup Node.js & build frontend assets
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: 📦 Install npm dependencies
+        run: npm ci
+
+      - name: 🔨 Build Vite assets
+        run: npm run build
+
+      # 3. Deploy via FTP
+      # Hanya upload file yang berubah (sync mode)
+      - name: 🚀 Deploy via FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          server-dir: /htdocs/
+          # Exclude file/folder yang tidak perlu di-upload
+          exclude: |
+            **/.git*
+            **/.git*/**
+            **/node_modules/**
+            **/tests/**
+            **/.env
+            **/.env.example
+            **/sehati.zip
+            **/.editorconfig
+            **/phpunit.xml
+            **/.npmrc
+            **/storage/logs/**
+            **/storage/framework/cache/**
+            **/storage/framework/sessions/**
+            **/storage/framework/views/**

@@ -1,0 +1,120 @@
+// =============================================
+// SEHATI — Entity Relationship Diagram (DBML)
+// Sistem Edukasi dan Skrining Hipertensi & Diabetes Terintegrasi
+// Scope: Single-Tenant (Kecamatan Tilango, Kab. Gorontalo)
+// =============================================
+
+// ----------------------------
+// MASTER DATA
+// ----------------------------
+
+Table villages {
+  id bigint [pk, increment]
+  name varchar(100) [not null, note: 'Nama desa di Kecamatan Tilango']
+  created_at timestamp
+  updated_at timestamp
+
+  Note: 'Daftar desa dalam 1 kecamatan (Tilango). Puskesmas = level kecamatan, jadi tidak perlu tabel puskesmas.'
+}
+
+Table health_posts {
+  id bigint [pk, increment]
+  village_id bigint [not null, ref: > villages.id, note: 'FK ke desa']
+  name varchar(100) [not null, note: 'Nama Posyandu (misal: Posyandu Mawar 1)']
+  created_at timestamp
+  updated_at timestamp
+
+  Note: 'Posyandu berada di bawah Desa. 1 Desa bisa punya banyak Posyandu.'
+}
+
+// ----------------------------
+// AUTHENTICATION & AUTHORIZATION
+// ----------------------------
+
+Table users {
+  id bigint [pk, increment]
+  name varchar(255) [not null]
+  email varchar(255) [unique, not null, note: 'Email untuk login']
+  password varchar(255) [not null, note: 'Bcrypt hash']
+  role enum('superadmin', 'admin_posyandu') [not null, note: 'Menentukan hak akses dashboard']
+  village_id bigint [null, ref: > villages.id, note: 'Diisi jika role = admin_posyandu']
+  remember_token varchar(100) [null]
+  created_at timestamp
+  updated_at timestamp
+
+  Note: '1 pintu login. Super Admin (Puskesmas/Ibu Lusi) melihat semua desa. Admin Posyandu hanya melihat desanya.'
+}
+
+// ----------------------------
+// DATA MASYARAKAT
+// ----------------------------
+
+Table respondents {
+  id bigint [pk, increment]
+  no_ktp varchar(16) [unique, not null, note: 'NIK 16 digit sebagai identifier unik']
+  name varchar(150) [not null, note: 'Nama lengkap responden']
+  birthdate date [not null]
+  gender enum('L', 'P') [not null]
+  age tinyint [not null, note: 'Umur saat mendaftar']
+  blood_type enum('A', 'B', 'AB', 'O', 'tidak_tahu') [null]
+  village_id bigint [null, ref: > villages.id, note: 'Desa domisili responden']
+  posyandu_id bigint [null, ref: > health_posts.id, note: 'Posyandu tempat terdaftar (opsional)']
+  created_at timestamp
+  updated_at timestamp
+
+  Note: 'Masyarakat tidak login (Guest). Diidentifikasi dari no_ktp. 1 orang bisa skrining berkali-kali.'
+}
+
+// ----------------------------
+// RIWAYAT SKRINING & RULE ENGINE
+// ----------------------------
+
+Table screenings {
+  id bigint [pk, increment]
+  respondent_id bigint [not null, ref: > respondents.id, note: 'FK ke responden']
+  screening_date date [not null, note: 'Untuk limit maks 2x skrining/hari']
+
+  // --- RAW INPUT: Bagian A (Riwayat Keluarga) ---
+  a_diabetes boolean [not null, default: false, note: 'Keluarga riwayat DM']
+  a_hipertensi boolean [not null, default: false, note: 'Keluarga riwayat HT']
+  a_jantung boolean [not null, default: false, note: 'Keluarga riwayat Jantung']
+  a_stroke boolean [not null, default: false, note: 'Keluarga riwayat Stroke']
+  a_kolesterol boolean [not null, default: false, note: 'Keluarga riwayat Kolesterol']
+
+  // --- RAW INPUT: Bagian B (Riwayat Diri Sendiri) ---
+  b_diabetes boolean [not null, default: false, note: 'Diri sendiri riwayat DM']
+  b_hipertensi boolean [not null, default: false, note: 'Diri sendiri riwayat HT']
+  b_jantung boolean [not null, default: false, note: 'Diri sendiri riwayat Jantung']
+  b_stroke boolean [not null, default: false, note: 'Diri sendiri riwayat Stroke']
+  b_kolesterol boolean [not null, default: false, note: 'Diri sendiri riwayat Kolesterol']
+
+  // --- RAW INPUT: Bagian C (Faktor Risiko & Pengukuran) ---
+  c_merokok boolean [not null, default: false, note: 'Status merokok']
+  c_fisik boolean [not null, default: false, note: 'Aktivitas fisik rutin']
+  c_buah_sayur boolean [not null, default: false, note: 'Konsumsi buah/sayur rutin']
+  c_sistolik smallint [not null, note: 'Tekanan darah sistolik (mmHg)']
+  c_diastolik smallint [not null, note: 'Tekanan darah diastolik (mmHg)']
+  c_gula float [null, note: 'GDS mg/dL (opsional jika tidak diperiksa)']
+  c_kolesterol_lab float [null, note: 'Kolesterol total mg/dL (opsional)']
+  c_asam_urat float [null, note: 'Asam urat mg/dL (opsional)']
+  c_berat float [not null, note: 'Berat badan (kg)']
+  c_tinggi float [not null, note: 'Tinggi badan (cm)']
+  c_perut float [not null, note: 'Lingkar perut (cm)']
+
+  // --- GATEC OUTPUT (Cached Rule Engine Results) ---
+  dm_status varchar(100) [not null, note: 'Status DM: Risiko Rendah / Sedang / Tinggi / Perlu Pemeriksaan Segera / Sudah Terdiagnosis']
+  dm_severity enum('critical', 'high', 'moderate', 'info', 'good') [not null]
+  ht_status varchar(100) [not null, note: 'Status HT: Risiko Rendah / Sedang / Tinggi / dll']
+  ht_severity enum('critical', 'high', 'moderate', 'info', 'good') [not null]
+  needs_urgent_referral boolean [not null, default: false, note: 'Flag: butuh rujukan SEGERA']
+  needs_referral boolean [not null, default: false, note: 'Flag: butuh rujukan biasa']
+
+  created_at timestamp
+  updated_at timestamp
+
+  indexes {
+    (respondent_id, screening_date) [name: 'idx_screening_daily_limit', note: 'Compound index untuk validasi maks 2x skrining/hari']
+  }
+
+  Note: 'Menyimpan raw input kuesioner + hasil kalkulasi GATEC. Hasil di-cache agar Dashboard tidak perlu menghitung ulang.'
+}
