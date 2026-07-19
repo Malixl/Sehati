@@ -4,10 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Traits\IsolatableByFacility;
 
 class Respondent extends Model
 {
-    use HasFactory;
+    use HasFactory, IsolatableByFacility;
 
     protected $fillable = [
         'device_id', 'nik', 'fullname', 'birthdate',

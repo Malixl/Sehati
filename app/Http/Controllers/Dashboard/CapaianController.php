@@ -18,7 +18,7 @@ class CapaianController extends Controller
         $user = Auth::user();
 
         $periods = \App\Models\ScreeningPeriod::orderBy('start_date', 'desc')->get();
-        $activePeriod = $periods->where('is_active', true)->first();
+        $activePeriod = $periods->where('is_currently_active', true)->first();
         
         $selectedPeriodId = $request->input('period_id', $activePeriod ? $activePeriod->id : null);
 
@@ -91,7 +91,7 @@ class CapaianController extends Controller
     {
         $user = Auth::user();
         $periods = \App\Models\ScreeningPeriod::orderBy('start_date', 'desc')->get();
-        $activePeriod = $periods->where('is_active', true)->first();
+        $activePeriod = $periods->where('is_currently_active', true)->first();
         $selectedPeriodId = $request->input('period_id', $activePeriod ? $activePeriod->id : null);
 
         $periodName = 'Semua Periode';

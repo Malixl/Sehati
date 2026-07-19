@@ -13,7 +13,7 @@ class ScreeningService
     public function getPaginatedScreenings($user, array $filters = [], string $sort = 'created_at', string $direction = 'desc', int $perPage = 15)
     {
         $query = Screening::filterByRole($user)
-            ->with(['respondent.healthPost', 'respondent.village', 'screeningPeriod']);
+            ->with(['respondent.healthPost', 'respondent.village.district', 'screeningPeriod']);
 
         // Search
         if (!empty($filters['search'])) {
@@ -56,7 +56,7 @@ class ScreeningService
     public function getScreeningDetails($user, $id)
     {
         return Screening::filterByRole($user)
-            ->with('respondent.healthPost', 'respondent.village')
+            ->with(['respondent.healthPost', 'respondent.village.district'])
             ->findOrFail($id);
     }
 

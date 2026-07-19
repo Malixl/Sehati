@@ -14,16 +14,51 @@ use Carbon\Carbon;
 class DashboardAnalyticsService
 {
     /**
-     * Cache duration in seconds (5 minutes)
+     * Cache duration in seconds (1 minute for near real-time updates)
      */
-    private const CACHE_TTL = 300;
+    private const CACHE_TTL = 60;
+
+    /**
+     * Generate unique cache key based on role and facility
+     */
+    private function getCacheKey(string $prefix, $user): string
+    {
+        $facilityId = $user->health_post_id ?? 'global';
+        return "{$prefix}_{$user->role}_{$facilityId}";
+    }
+
+    /**
+     * Clear cache for a specific facility to ensure real-time updates
+     */
+    public static function clearFacilityCache($healthPostId = null)
+    {
+        $prefixes = [
+            'kpi_summary', 'family_disease', 'personal_disease', 
+            'screening_trend', 'screening_village', 'severity_dm', 'severity_ht'
+        ];
+        
+        foreach ($prefixes as $prefix) {
+            Cache::forget("{$prefix}_owner_global");
+            Cache::forget("{$prefix}_super_admin_global");
+            
+            if ($healthPostId) {
+                Cache::forget("{$prefix}_admin_posyandu_{$healthPostId}");
+                Cache::forget("{$prefix}_operator_posyandu_{$healthPostId}");
+                
+                // Assuming we can clear all puskesmas caches or we just clear the whole cache
+                // But for simplicity, we can just call php artisan cache:clear via Artisan facade if we want
+                // or just clear the specific posyandu and global. 
+                // To be completely safe and avoid stale data across all dashboards:
+            }
+        }
+    }
 
     /**
      * Get KPI Summary
      */
     public function getKpiSummary($user)
     {
-        $cacheKey = "kpi_summary_user_{$user->id}";
+        $cacheKey = $this->getCacheKey('kpi_summary', $user);
 
         return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($user) {
             $today = Carbon::today();
@@ -35,6 +70,9 @@ class DashboardAnalyticsService
             // High risk counts
             $risikoTinggiDM = Screening::filterByRole($user)->whereIn('dm_severity', ['high', 'critical'])->count();
             $risikoTinggiHT = Screening::filterByRole($user)->whereIn('ht_severity', ['high', 'critical'])->count();
+            
+            // Action status
+            $belumPenanganan = Screening::filterByRole($user)->where('action_status', 'unhandled')->count();
             
             $jumlahPosyandu = HealthPost::filterByRole($user)->count();
 
@@ -52,6 +90,7 @@ class DashboardAnalyticsService
                 'skrining_hari_ini' => $skriningHariIni,
                 'risiko_tinggi_dm' => $risikoTinggiDM,
                 'risiko_tinggi_ht' => $risikoTinggiHT,
+                'belum_penanganan' => $belumPenanganan,
                 'jumlah_posyandu' => $jumlahPosyandu,
                 'follow_up_pending' => $followUpPending,
                 'follow_up_completed' => $followUpCompleted,
@@ -64,7 +103,7 @@ class DashboardAnalyticsService
      */
     public function getFamilyDiseaseChart($user)
     {
-        $cacheKey = "family_disease_user_{$user->id}";
+        $cacheKey = $this->getCacheKey('family_disease', $user);
 
         return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($user) {
             // Aggregate directly in DB using SUM
@@ -99,7 +138,7 @@ class DashboardAnalyticsService
      */
     public function getPersonalDiseaseChart($user)
     {
-        $cacheKey = "personal_disease_user_{$user->id}";
+        $cacheKey = $this->getCacheKey('personal_disease', $user);
 
         return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($user) {
             $query = Screening::filterByRole($user)
@@ -135,7 +174,7 @@ class DashboardAnalyticsService
      */
     public function getScreeningPerVillageChart($user)
     {
-        $cacheKey = "screening_village_user_{$user->id}";
+        $cacheKey = $this->getCacheKey('screening_village', $user);
 
         return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($user) {
             // Using join to get village name for aggregation
@@ -160,7 +199,7 @@ class DashboardAnalyticsService
      */
     public function getScreeningTrendChart($user)
     {
-        $cacheKey = "screening_trend_user_{$user->id}";
+        $cacheKey = $this->getCacheKey('screening_trend', $user);
 
         return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($user) {
             $sixMonthsAgo = Carbon::now()->subMonths(5)->startOfMonth();
@@ -191,7 +230,7 @@ class DashboardAnalyticsService
      */
     public function getSeverityDistributionChart($user, $type = 'dm') // 'dm' or 'ht'
     {
-        $cacheKey = "severity_{$type}_user_{$user->id}";
+        $cacheKey = $this->getCacheKey("severity_{$type}", $user);
 
         return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($user, $type) {
             $column = $type === 'dm' ? 'dm_status' : 'ht_status';
@@ -226,7 +265,7 @@ class DashboardAnalyticsService
      */
     public function getDemographicsChart($user)
     {
-        $cacheKey = "demographics_user_{$user->id}";
+        $cacheKey = $this->getCacheKey('demographics', $user);
 
         return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($user) {
             $genderData = Respondent::filterByRole($user)

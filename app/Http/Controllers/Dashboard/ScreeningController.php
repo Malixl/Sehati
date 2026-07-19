@@ -31,9 +31,10 @@ class ScreeningController extends Controller
 
     public function show($id)
     {
-        $user = Auth::user();
-
-        $screening = $this->screeningService->getScreeningDetails($user, $id);
+        $screening = Screening::findOrFail($id);
+        $this->authorize('view', $screening);
+        
+        $screening->load(['respondent.healthPost', 'respondent.village', 'device', 'screeningPeriod', 'followUp']);
 
         $decision = json_decode($screening->decision_explanation, true);
 
@@ -50,8 +51,8 @@ class ScreeningController extends Controller
             'action_status' => 'required|in:unhandled,in_progress,completed'
         ]);
 
-        $user = Auth::user();
-        $screening = $this->screeningService->getScreeningDetails($user, $id);
+        $screening = Screening::findOrFail($id);
+        $this->authorize('update', $screening);
 
         $screening->action_status = $request->action_status;
         $screening->save();
@@ -61,8 +62,10 @@ class ScreeningController extends Controller
 
     public function destroy($id)
     {
-        $user = Auth::user();
-        $this->screeningService->deleteScreening($user, $id);
+        $screening = Screening::findOrFail($id);
+        $this->authorize('delete', $screening);
+        
+        $screening->delete();
 
         return redirect()->back()->with('success', 'Data skrining berhasil dihapus.');
     }

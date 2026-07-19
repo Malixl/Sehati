@@ -13,7 +13,7 @@ class RespondentService
     public function getPaginatedRespondents($user, array $filters = [], string $sort = 'created_at', string $direction = 'desc', int $perPage = 10)
     {
         $query = Respondent::filterByRole($user)
-            ->with('healthPost', 'village')
+            ->with(['healthPost', 'village.district'])
             ->withCount('screenings');
 
         // Search
@@ -52,7 +52,7 @@ class RespondentService
     public function getRespondentDetails($user, $id)
     {
         return Respondent::filterByRole($user)
-            ->with(['healthPost', 'village', 'screenings' => function ($q) {
+            ->with(['healthPost', 'village.district', 'screenings' => function ($q) {
                 $q->orderBy('created_at', 'desc');
             }])
             ->findOrFail($id);

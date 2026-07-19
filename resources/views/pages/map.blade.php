@@ -208,6 +208,15 @@
                 }
             }
 
+            // Lazy Loading wrapper for GeoJSON to prevent main-thread blocking
+            function initGeoJSONLazy() {
+                if ('requestIdleCallback' in window) {
+                    requestIdleCallback(() => loadGeoJSON());
+                } else {
+                    setTimeout(() => loadGeoJSON(), 500);
+                }
+            }
+
             // Try to get user location
             if (navigator.geolocation) {
                 statusText.textContent = 'Mencari lokasi Anda...';
@@ -222,17 +231,17 @@
                             .bindPopup('<strong>Lokasi Anda Saat Ini</strong>')
                             .openPopup();
 
-                        loadGeoJSON();
+                        initGeoJSONLazy();
                     },
                     (error) => {
                         console.warn('Geolocation ditolak, menggunakan default Gorontalo.');
                         statusText.textContent = 'Lokasi GPS tidak tersedia, menampilkan Gorontalo.';
-                        loadGeoJSON();
+                        initGeoJSONLazy();
                     },
                     { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
                 );
             } else {
-                loadGeoJSON();
+                initGeoJSONLazy();
             }
         });
     </script>

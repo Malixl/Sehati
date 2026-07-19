@@ -31,10 +31,14 @@
                 <td class="px-4 py-3 text-gray-500">{{ \Carbon\Carbon::parse($period->start_date)->format('d M Y') }}</td>
                 <td class="px-4 py-3 text-gray-500">{{ \Carbon\Carbon::parse($period->end_date)->format('d M Y') }}</td>
                 <td class="px-4 py-3">
-                    @if($period->is_active)
+                    @if($period->is_currently_active)
                         <span class="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded border border-green-400">Aktif/Buka</span>
                     @else
-                        <span class="bg-gray-100 text-gray-800 text-xs font-medium px-2.5 py-0.5 rounded border border-gray-400">Tutup</span>
+                        @if($period->is_active)
+                            <span class="bg-yellow-100 text-yellow-800 text-xs font-medium px-2.5 py-0.5 rounded border border-yellow-400">Menunggu/Lewat</span>
+                        @else
+                            <span class="bg-gray-100 text-gray-800 text-xs font-medium px-2.5 py-0.5 rounded border border-gray-400">Tutup</span>
+                        @endif
                     @endif
                 </td>
                 <td class="px-4 py-3">
@@ -50,7 +54,10 @@
                     <form action="{{ route('dashboard.periode.toggle', $period->id) }}" method="POST" class="inline">
                         @csrf
                         @method('PATCH')
-                        <button type="submit" class="{{ $period->is_active ? 'text-orange-600 hover:text-orange-900' : 'text-green-600 hover:text-green-900' }} font-medium text-sm" title="{{ $period->is_active ? 'Tutup Periode' : 'Aktifkan Periode' }}">
+                        <button type="submit" 
+                                @if($period->is_expired) disabled @endif
+                                class="{{ $period->is_expired ? 'text-gray-300 cursor-not-allowed' : ($period->is_active ? 'text-orange-600 hover:text-orange-900' : 'text-green-600 hover:text-green-900') }} font-medium text-sm" 
+                                title="{{ $period->is_expired ? 'Periode Sudah Kedaluwarsa' : ($period->is_active ? 'Tutup Periode' : 'Aktifkan Periode') }}">
                             @if($period->is_active)
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                             @else

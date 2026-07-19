@@ -39,9 +39,11 @@ class RespondentController extends Controller
 
     public function show($id)
     {
-        $user = Auth::user();
+        $respondent = Respondent::findOrFail($id);
+        $this->authorize('view', $respondent);
         
-        $respondent = $this->respondentService->getRespondentDetails($user, $id);
+        // Eager load relations for view
+        $respondent->load(['device', 'village', 'healthPost']);
 
         return view('pages.dashboard.responden.show', compact('respondent'));
     }
@@ -66,6 +68,7 @@ class RespondentController extends Controller
     public function update(Request $request, $id)
     {
         $respondent = Respondent::findOrFail($id);
+        $this->authorize('update', $respondent);
 
         $request->validate([
             'nik' => 'required|string|size:16|unique:respondents,nik,'.$id,
@@ -85,6 +88,7 @@ class RespondentController extends Controller
     public function destroy($id)
     {
         $respondent = Respondent::findOrFail($id);
+        $this->authorize('delete', $respondent);
         
         // Optionally prevent deleting if they have screenings?
         // But for this CRUD, we will delete it (and let DB cascade or we force it)

@@ -76,6 +76,10 @@ class ScreeningPeriodController extends Controller
 
         $period = ScreeningPeriod::findOrFail($id);
         
+        if ($period->is_expired) {
+            return redirect()->route('dashboard.periode.index')->with('error', 'Tidak dapat mengubah status periode yang sudah kedaluwarsa.');
+        }
+        
         // If we only want one active period at a time:
         if (!$period->is_active) {
             ScreeningPeriod::where('id', '!=', $id)->update(['is_active' => false]);
