@@ -128,9 +128,13 @@
                     setTimeout(() => this.validationError = '', 3000);
                     return;
                 }
+                
+                // Scroll to top INSTANTLY before showing loading
+                window.scrollTo(0, 0);
+                
                 this.isLoading = true;
                 document.body.style.overflow = 'hidden';
-                window.scrollTo({ top: 0, behavior: 'smooth' });
+                
                 setTimeout(() => {
                     this.$refs.form.submit();
                 }, 2500);
@@ -569,16 +573,18 @@
         </form>
 
         {{-- Loading Overlay --}}
-        <div x-show="isLoading" x-cloak
-            class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-white/90 backdrop-blur-sm"
-            x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0"
-            x-transition:enter-end="opacity-100">
-            <lottie-player src="{{ asset('img/heartbeat.json') }}" background="transparent" speed="1"
-                style="width: 200px; height: 200px;" loop autoplay>
-            </lottie-player>
-            <h3 class="mt-4 text-xl font-bold text-gray-900 animate-pulse">Sedang menganalisis hasil skrining Anda...</h3>
-            <p class="text-sm text-gray-500 mt-2">Harap tunggu sebentar</p>
-        </div>
+        <template x-teleport="body">
+            <div x-show="isLoading" x-cloak
+                class="fixed top-0 left-0 w-screen h-screen z-[9999] flex flex-col items-center justify-center bg-white/90 backdrop-blur-sm"
+                x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0"
+                x-transition:enter-end="opacity-100">
+                <lottie-player src="{{ asset('img/heartbeat.json') }}" background="transparent" speed="1"
+                    style="width: 200px; height: 200px;" loop autoplay>
+                </lottie-player>
+                <h3 class="mt-4 text-xl font-bold text-gray-900 animate-pulse">Sedang menganalisis hasil skrining Anda...</h3>
+                <p class="text-sm text-gray-500 mt-2">Harap tunggu sebentar</p>
+            </div>
+        </template>
 
     </div>
 @endsection

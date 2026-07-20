@@ -4,7 +4,7 @@
 
 @section('content')
 
-    <x-dashboard.page-header title="Hasil Capaian Program PTM"
+    <x-dashboard.page-header title="Hasil Capaian Skrining Program PTM"
         subtitle="Laporan rekapitulasi capaian Usia Produktif, Hipertensi, dan Diabetes Melitus per Desa."
         :breadcrumb="['Hasil Capaian' => null]">
         <x-slot name="action">
@@ -23,50 +23,64 @@
     <div class="flex flex-wrap items-center justify-end mb-4 gap-3">
         <form id="capaianForm" action="{{ route('dashboard.capaian.index') }}" method="GET"
             class="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
-            
+
             <input type="hidden" name="period_id" id="period_id_input" value="{{ $selectedPeriodId }}">
-            
-            <button id="dropdownPeriodButton" data-dropdown-toggle="dropdownPeriod" class="inline-flex items-center justify-between bg-white border border-gray-300 text-gray-900 text-sm rounded-lg hover:bg-gray-50 focus:ring-4 focus:outline-none focus:ring-gray-200 p-2.5 shadow-sm min-w-[200px] sm:w-[260px] transition-all duration-300 hover:border-blue-400" type="button">
-              <span class="truncate pr-3">
-                @php
-                    $selectedPeriod = $periods->firstWhere('id', $selectedPeriodId);
-                @endphp
-                {{ $selectedPeriod ? $selectedPeriod->name . ($selectedPeriod->is_active ? ' (Aktif)' : '') : 'Semua Waktu (Tanpa Periode)' }}
-              </span>
-              <svg class="w-2.5 h-2.5 ms-2.5 flex-shrink-0" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
-                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 4 4 4-4"/>
-              </svg>
+
+            <button id="dropdownPeriodButton" data-dropdown-toggle="dropdownPeriod"
+                class="inline-flex items-center justify-between bg-white border border-gray-300 text-gray-900 text-sm rounded-lg hover:bg-gray-50 focus:ring-4 focus:outline-none focus:ring-gray-200 p-2.5 shadow-sm min-w-[200px] sm:w-[260px] transition-all duration-300 hover:border-blue-400"
+                type="button">
+                <span class="truncate pr-3">
+                    @php
+                        $selectedPeriod = $periods->firstWhere('id', $selectedPeriodId);
+                    @endphp
+                    {{ $selectedPeriod ? $selectedPeriod->name . ($selectedPeriod->is_active ? ' (Aktif)' : '') : 'Semua Waktu (Tanpa Periode)' }}
+                </span>
+                <svg class="w-2.5 h-2.5 ms-2.5 flex-shrink-0" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+                    fill="none" viewBox="0 0 10 6">
+                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="m1 1 4 4 4-4" />
+                </svg>
             </button>
 
             <!-- Dropdown menu -->
             <div id="dropdownPeriod" class="z-10 hidden bg-white rounded-lg shadow-lg w-[260px] border border-gray-200">
                 <div class="p-3">
-                  <label for="input-period-search" class="sr-only">Cari Periode</label>
-                  <div class="relative">
-                    <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
-                      <svg class="w-4 h-4 text-gray-500" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
-                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"/>
-                      </svg>
+                    <label for="input-period-search" class="sr-only">Cari Periode</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+                            <svg class="w-4 h-4 text-gray-500" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+                                fill="none" viewBox="0 0 20 20">
+                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z" />
+                            </svg>
+                        </div>
+                        <input type="text" id="input-period-search"
+                            class="block w-full p-2 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500"
+                            placeholder="Cari nama periode..." onkeyup="filterPeriodList()">
                     </div>
-                    <input type="text" id="input-period-search" class="block w-full p-2 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500" placeholder="Cari nama periode..." onkeyup="filterPeriodList()">
-                  </div>
                 </div>
-                <ul class="h-48 px-3 pb-3 overflow-y-auto text-sm text-gray-700" aria-labelledby="dropdownPeriodButton" id="period-list">
-                  <li>
-                    <button type="button" onclick="document.getElementById('period_id_input').value=''; document.getElementById('capaianForm').submit();" class="flex items-center w-full text-left ps-2 p-2 rounded hover:bg-gray-100 {{ !$selectedPeriodId ? 'bg-blue-50 text-blue-700 font-semibold' : '' }}">
-                      Semua Waktu (Tanpa Periode)
-                    </button>
-                  </li>
-                  @foreach($periods as $period)
-                  <li class="period-item">
-                    <button type="button" onclick="document.getElementById('period_id_input').value='{{ $period->id }}'; document.getElementById('capaianForm').submit();" class="flex items-center justify-between w-full text-left ps-2 p-2 rounded hover:bg-gray-100 {{ $selectedPeriodId == $period->id ? 'bg-blue-50 text-blue-700 font-semibold' : '' }}">
-                      <span class="truncate period-name">{{ $period->name }}</span>
-                      @if($period->is_active)
-                         <span class="bg-blue-100 text-blue-800 text-[10px] font-semibold px-2 py-0.5 rounded border border-blue-400 ml-2">Aktif</span>
-                      @endif
-                    </button>
-                  </li>
-                  @endforeach
+                <ul class="h-48 px-3 pb-3 overflow-y-auto text-sm text-gray-700" aria-labelledby="dropdownPeriodButton"
+                    id="period-list">
+                    <li>
+                        <button type="button"
+                            onclick="document.getElementById('period_id_input').value=''; document.getElementById('capaianForm').submit();"
+                            class="flex items-center w-full text-left ps-2 p-2 rounded hover:bg-gray-100 {{ !$selectedPeriodId ? 'bg-blue-50 text-blue-700 font-semibold' : '' }}">
+                            Semua Waktu (Tanpa Periode)
+                        </button>
+                    </li>
+                    @foreach($periods as $period)
+                        <li class="period-item">
+                            <button type="button"
+                                onclick="document.getElementById('period_id_input').value='{{ $period->id }}'; document.getElementById('capaianForm').submit();"
+                                class="flex items-center justify-between w-full text-left ps-2 p-2 rounded hover:bg-gray-100 {{ $selectedPeriodId == $period->id ? 'bg-blue-50 text-blue-700 font-semibold' : '' }}">
+                                <span class="truncate period-name">{{ $period->name }}</span>
+                                @if($period->is_active)
+                                    <span
+                                        class="bg-blue-100 text-blue-800 text-[10px] font-semibold px-2 py-0.5 rounded border border-blue-400 ml-2">Aktif</span>
+                                @endif
+                            </button>
+                        </li>
+                    @endforeach
                 </ul>
             </div>
 
@@ -108,11 +122,11 @@
                         <th class="px-3 py-2 border border-gray-300">SASARAN</th>
                         <th class="px-3 py-2 border border-gray-300">CAPAIAN</th>
                         <th class="px-2 py-2 border border-gray-300">%</th>
-                        
+
                         <th class="px-3 py-2 border border-gray-300 bg-red-50">SASARAN</th>
                         <th class="px-3 py-2 border border-gray-300 bg-red-50">CAPAIAN</th>
                         <th class="px-2 py-2 border border-gray-300 bg-red-50">%</th>
-                        
+
                         <th class="px-3 py-2 border border-gray-300 bg-yellow-50">SASARAN</th>
                         <th class="px-3 py-2 border border-gray-300 bg-yellow-50">CAPAIAN</th>
                         <th class="px-2 py-2 border border-gray-300 bg-yellow-50">%</th>
@@ -147,12 +161,14 @@
                             <td class="px-2 py-2 border border-gray-200 font-medium">{{ $row->screened_pct }}%</td>
 
                             {{-- HT --}}
-                            <td class="px-3 py-2 border border-gray-200 font-semibold bg-red-50/30 text-red-700">{{ $row->target_ht }}</td>
+                            <td class="px-3 py-2 border border-gray-200 font-semibold bg-red-50/30 text-red-700">
+                                {{ $row->target_ht }}</td>
                             <td class="px-3 py-2 border border-gray-200 bg-red-50/30">{{ $row->ht_count }}</td>
                             <td class="px-2 py-2 border border-gray-200 font-medium bg-red-50/30">{{ $row->ht_pct }}%</td>
 
                             {{-- DM --}}
-                            <td class="px-3 py-2 border border-gray-200 font-semibold bg-yellow-50/30 text-yellow-700">{{ $row->target_dm }}</td>
+                            <td class="px-3 py-2 border border-gray-200 font-semibold bg-yellow-50/30 text-yellow-700">
+                                {{ $row->target_dm }}</td>
                             <td class="px-3 py-2 border border-gray-200 bg-yellow-50/30">{{ $row->dm_count }}</td>
                             <td class="px-2 py-2 border border-gray-200 font-medium bg-yellow-50/30">{{ $row->dm_pct }}%</td>
 
@@ -177,25 +193,28 @@
                         {{-- Row JUMLAH --}}
                         <tr class="font-bold bg-gray-100 border-t-2 border-gray-300">
                             <td colspan="2" class="px-4 py-3 border border-gray-300">JUMLAH</td>
-                            
+
                             {{-- Usia Produktif --}}
                             <td class="px-3 py-3 border border-gray-300 text-gray-900 font-bold">{{ $sumSasaranUsia }}</td>
                             <td class="px-3 py-3 border border-gray-300 text-gray-900">{{ $sumCapaianUsia }}</td>
                             <td class="px-2 py-3 border border-gray-300">
-                                {{ $sumSasaranUsia > 0 ? round(($sumCapaianUsia / $sumSasaranUsia) * 100) : 0 }}%</td>
+                                {{ $sumSasaranUsia > 0 ? round(($sumCapaianUsia / $sumSasaranUsia) * 100) : 0 }}%
+                            </td>
 
                             {{-- HT --}}
                             <td class="px-3 py-3 border border-gray-300 bg-red-100 font-bold">{{ $sumSasaranHt }}</td>
                             <td class="px-3 py-3 border border-gray-300 bg-red-100">{{ $sumCapaianHt }}</td>
                             <td class="px-2 py-3 border border-gray-300 bg-red-100">
-                                {{ $sumSasaranHt > 0 ? round(($sumCapaianHt / $sumSasaranHt) * 100) : 0 }}%</td>
+                                {{ $sumSasaranHt > 0 ? round(($sumCapaianHt / $sumSasaranHt) * 100) : 0 }}%
+                            </td>
 
                             {{-- DM --}}
                             <td class="px-3 py-3 border border-gray-300 bg-yellow-100 font-bold">{{ $sumSasaranDm }}</td>
                             <td class="px-3 py-3 border border-gray-300 bg-yellow-100">{{ $sumCapaianDm }}</td>
                             <td class="px-2 py-3 border border-gray-300 bg-yellow-100">
-                                {{ $sumSasaranDm > 0 ? round(($sumCapaianDm / $sumSasaranDm) * 100) : 0 }}%</td>
-                                
+                                {{ $sumSasaranDm > 0 ? round(($sumCapaianDm / $sumSasaranDm) * 100) : 0 }}%
+                            </td>
+
                             <td colspan="2" class="px-2 py-3 border border-gray-300"></td>
                         </tr>
 

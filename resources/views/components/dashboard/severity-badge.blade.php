@@ -7,19 +7,17 @@
     $normalized = strtolower($displayText);
     
     if (str_contains($normalized, 'rendah') || str_contains($normalized, 'low')) {
-        $color = 'emerald';
+        $classes = 'bg-emerald-100 text-emerald-800';
     } elseif (str_contains($normalized, 'sedang') || str_contains($normalized, 'moderate')) {
-        $color = 'yellow';
+        $classes = 'bg-yellow-100 text-yellow-800';
     } elseif (str_contains($normalized, 'tinggi') || str_contains($normalized, 'high')) {
-        $color = 'orange';
+        $classes = 'bg-orange-100 text-orange-800';
     } elseif (str_contains($normalized, 'terdiagnosa') || str_contains($normalized, 'kritis') || str_contains($normalized, 'critical')) {
-        $color = 'red';
+        $classes = 'bg-red-100 text-red-800';
     } else {
-        $color = 'gray';
+        $classes = 'bg-gray-100 text-gray-800';
     }
     
-    // Tailwind classes mapping to avoid purge issues
-    $classes = "bg-{$color}-100 text-{$color}-800";
     if($level === 'critical') {
         $classes .= " font-bold border border-red-200 animate-pulse";
     }
