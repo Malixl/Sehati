@@ -21,8 +21,8 @@ class ScreeningController extends Controller
         $user = Auth::user();
 
         $filters = $request->only(['search', 'severity']);
-        $sort = $request->get('sort', 'created_at');
-        $direction = $request->get('direction', 'desc');
+        $sort = $request->input('sort', 'created_at');
+        $direction = $request->input('direction', 'desc');
 
         $screenings = $this->screeningService->getPaginatedScreenings($user, $filters, $sort, $direction);
 
@@ -76,7 +76,7 @@ class ScreeningController extends Controller
         $filters = $request->only(['search', 'severity']);
 
         $query = Screening::filterByRole($user)
-            ->with(['respondent.healthPost', 'respondent.village']);
+            ->with(['respondent.healthPost', 'respondent.village', 'screeningPeriod']);
 
         if (!empty($filters['search'])) {
             $search = $filters['search'];
@@ -90,115 +90,76 @@ class ScreeningController extends Controller
             $query->where('recommendation_level', $filters['severity']);
         }
 
-        $screenings = $query->orderBy('created_at', 'desc')->get();
+        $query->orderBy('created_at', 'desc');
 
-        $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
-        $sheet = $spreadsheet->getActiveSheet();
+        return response()->streamDownload(function () use ($query) {
+            $handle = fopen('php://output', 'w');
 
-        // Set Headers
-        $headers = [
-            'No',
-            'Tgl Skrining',
-            'Periode Skrining',
-            'NIK',
-            'Nama Lengkap',
-            'Umur',
-            'Jenis Kelamin',
-            'Sistolik',
-            'Diastolik',
-            'Gula Darah',
-            'Kolesterol',
-            'Asam Urat',
-            'Status DM',
-            'Status HT',
-            'Rekomendasi',
-            'Status Tindakan',
-            'Posyandu'
-        ];
-        $sheet->fromArray($headers, null, 'A1');
+            // Tambahkan BOM (Byte Order Mark) agar karakter UTF-8 terbaca sempurna di Microsoft Excel
+            fputs($handle, "\xEF\xBB\xBF");
 
-        // Style Headers
-        $headerStyle = [
-            'font' => ['bold' => true],
-            'fill' => [
-                'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
-                'startColor' => ['rgb' => 'FFFF00']
-            ],
-            'alignment' => [
-                'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
-                'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER,
-            ],
-            'borders' => [
-                'allBorders' => [
-                    'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
-                    'color' => ['argb' => 'FF000000'],
-                ],
-            ],
-        ];
-        $lastCol = 'Q';
-        $sheet->getStyle('A1:' . $lastCol . '1')->applyFromArray($headerStyle);
+            // Tulis Header
+            fputcsv($handle, [
+                'No',
+                'Tgl Skrining',
+                'Periode Skrining',
+                'NIK',
+                'Nama Lengkap',
+                'Umur',
+                'Jenis Kelamin',
+                'Sistolik',
+                'Diastolik',
+                'Gula Darah',
+                'Kolesterol',
+                'Asam Urat',
+                'Status DM',
+                'Status HT',
+                'Rekomendasi',
+                'Status Tindakan',
+                'Posyandu'
+            ]);
 
-        $row = 2;
-        foreach ($screenings as $index => $s) {
-            $r = $s->respondent;
-            $age = $r->birthdate ? \Carbon\Carbon::parse($r->birthdate)->age : '-';
-            $gender = $r->gender == 'L' ? 'Laki-laki' : 'Perempuan';
+            $index = 1;
+            // Gunakan cursor() untuk mengambil data baris per baris tanpa membebani memori (Lazy Collection)
+            foreach ($query->cursor() as $s) {
+                $r = $s->respondent;
+                $age = $r->birthdate ? \Carbon\Carbon::parse($r->birthdate)->age : '-';
+                $gender = $r->gender == 'L' ? 'Laki-laki' : 'Perempuan';
 
-            $data = [
-                $index + 1,
-                $s->created_at->format('Y-m-d H:i'),
-                $s->screeningPeriod->name ?? 'Tanpa Periode',
-                $r->nik ?? '-',
-                $r->fullname ?? '-',
-                $age,
-                $gender,
-                $s->c_sistolik,
-                $s->c_diastolik,
-                $s->c_gula,
-                $s->c_kolesterol,
-                $s->c_asam_urat,
-                $s->dm_status,
-                $s->ht_status,
-                $s->recommendation_level,
-                $s->action_status == 'unhandled' ? 'Belum' : ($s->action_status == 'in_progress' ? 'Diproses' : 'Selesai'),
-                $r->healthPost->name ?? '-'
-            ];
+                // Tambahkan tanda petik pada NIK agar Excel membacanya sebagai string (mencegah format eksponensial)
+                $nik = $r->nik ? "'" . $r->nik : '-';
 
-            $sheet->fromArray($data, null, 'A' . $row);
-            // Force NIK to be string so it doesn't become scientific notation
-            $sheet->setCellValueExplicit('D' . $row, $r->nik ?? '-', \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
-            $row++;
-        }
+                // Tulis data baris per baris langsung ke output buffer browser (Stream)
+                fputcsv($handle, [
+                    $index,
+                    $s->created_at->format('Y-m-d H:i'),
+                    $s->screeningPeriod->name ?? 'Tanpa Periode',
+                    $nik,
+                    $r->fullname ?? '-',
+                    $age,
+                    $gender,
+                    $s->c_sistolik,
+                    $s->c_diastolik,
+                    $s->c_gula,
+                    $s->c_kolesterol,
+                    $s->c_asam_urat,
+                    $s->dm_status,
+                    $s->ht_status,
+                    $s->recommendation_level,
+                    $s->action_status == 'unhandled' ? 'Belum' : ($s->action_status == 'in_progress' ? 'Diproses' : 'Selesai'),
+                    $r->healthPost->name ?? '-'
+                ]);
 
-        // Style Body
-        if ($row > 2) {
-            $bodyStyle = [
-                'alignment' => [
-                    'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
-                    'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER,
-                ],
-                'borders' => [
-                    'allBorders' => [
-                        'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
-                        'color' => ['argb' => 'FF000000'],
-                    ],
-                ],
-            ];
-            $sheet->getStyle('A2:' . $lastCol . ($row - 1))->applyFromArray($bodyStyle);
-        }
+                $index++;
+            }
 
-        // Auto size columns
-        foreach (range('A', $lastCol) as $col) {
-            $sheet->getColumnDimension($col)->setAutoSize(true);
-        }
-
-        $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
-        $tempFile = tempnam(sys_get_temp_dir(), 'excel');
-        $writer->save($tempFile);
-
-        return response()->download($tempFile, 'Data_Skrining.xlsx', [
-            'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-        ])->deleteFileAfterSend(true);
+            fclose($handle);
+        }, 'Data_Skrining.csv', [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+            'Cache-Control' => 'no-cache, no-store, must-revalidate',
+            'Pragma' => 'no-cache',
+            'Expires' => '0'
+        ]);
     }
 
     private function respondJson($screening, $decision)

@@ -9,6 +9,34 @@
             totalSteps: 3,
             isLoading: false,
             validationError: '',
+            showIncompleteModal: false,
+            incompleteFields: [],
+
+            getUnansweredQuestions() {
+                let missing = [];
+                if (this.step === 1) {
+                    if (this.a_diabetes === null) missing.push('1. Penyakit Diabetes');
+                    if (this.a_hipertensi === null) missing.push('2. Penyakit Hipertensi');
+                    if (this.a_jantung === null) missing.push('3. Penyakit Jantung');
+                    if (this.a_stroke === null) missing.push('4. Penyakit Stroke');
+                    if (this.a_kolesterol === null) missing.push('5. Kolesterol Tinggi');
+                } else if (this.step === 2) {
+                    if (this.b_diabetes === null) missing.push('1. Penyakit Diabetes');
+                    if (this.b_hipertensi === null) missing.push('2. Penyakit Hipertensi');
+                    if (this.b_jantung === null) missing.push('3. Penyakit Jantung');
+                    if (this.b_stroke === null) missing.push('4. Penyakit Stroke');
+                    if (this.b_asma === null) missing.push('5. Penyakit Asma');
+                    if (this.b_kolesterol === null) missing.push('6. Kolesterol Tinggi');
+                } else if (this.step === 3) {
+                    if (this.c_tekanan_sistolik === '') missing.push('1. Sistolik (Tekanan Darah)');
+                    if (this.c_tekanan_diastolik === '') missing.push('1. Diastolik (Tekanan Darah)');
+                    if (this.c_tinggi === '') missing.push('2. Tinggi Badan');
+                    if (this.c_berat === '') missing.push('3. Berat Badan');
+                    if (this.c_lingkar_perut === '') missing.push('5. Lingkar Perut');
+                    if (this.c_merokok === null) missing.push('7. Merokok');
+                }
+                return missing;
+            },
 
             // Bagian A — Riwayat Penyakit Tidak Menular Pada Keluarga
             a_diabetes: null,
@@ -102,9 +130,9 @@
             },
 
             nextStep() {
-                if (!this.canProceed()) {
-                    this.validationError = 'Mohon lengkapi semua pertanyaan sebelum melanjutkan.';
-                    setTimeout(() => this.validationError = '', 3000);
+                this.incompleteFields = this.getUnansweredQuestions();
+                if (this.incompleteFields.length > 0) {
+                    this.showIncompleteModal = true;
                     return;
                 }
                 this.validationError = '';
@@ -123,9 +151,9 @@
             },
 
             submitForm() {
-                if (!this.canProceed()) {
-                    this.validationError = 'Mohon lengkapi semua pertanyaan sebelum mengirim.';
-                    setTimeout(() => this.validationError = '', 3000);
+                this.incompleteFields = this.getUnansweredQuestions();
+                if (this.incompleteFields.length > 0) {
+                    this.showIncompleteModal = true;
                     return;
                 }
                 
@@ -157,20 +185,64 @@
             </div>
         </div>
 
-        {{-- Validation Error Alert --}}
-        <div x-show="validationError" x-cloak
-            x-transition:enter="transition ease-out duration-300"
-            x-transition:enter-start="opacity-0 -translate-y-2"
-            x-transition:enter-end="opacity-100 translate-y-0"
-            x-transition:leave="transition ease-in duration-200"
-            x-transition:leave-start="opacity-100 translate-y-0"
-            x-transition:leave-end="opacity-0 -translate-y-2"
-            class="flex p-4 mb-4 text-sm text-red-800 rounded-lg bg-red-50 border border-red-200" role="alert">
-            <svg class="shrink-0 inline w-4 h-4 mr-3 mt-0.5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
-            </svg>
-            <span x-text="validationError"></span>
-        </div>
+        {{-- Incomplete Fields Modal --}}
+        <template x-teleport="body">
+            <div x-show="showIncompleteModal" x-cloak
+                class="fixed inset-0 z-100 flex items-center justify-center p-4 bg-gray-900/60 backdrop-blur-sm"
+                x-transition:enter="transition ease-out duration-300"
+                x-transition:enter-start="opacity-0"
+                x-transition:enter-end="opacity-100"
+                x-transition:leave="transition ease-in duration-200"
+                x-transition:leave-start="opacity-100"
+                x-transition:leave-end="opacity-0">
+                
+                <div class="relative w-full max-w-md bg-white rounded-2xl shadow-2xl overflow-hidden"
+                    @click.away="showIncompleteModal = false"
+                    x-transition:enter="transition ease-out duration-300 transform"
+                    x-transition:enter-start="opacity-0 translate-y-8 sm:translate-y-0 sm:scale-95"
+                    x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
+                    x-transition:leave="transition ease-in duration-200 transform"
+                    x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
+                    x-transition:leave-end="opacity-0 translate-y-8 sm:translate-y-0 sm:scale-95">
+                    
+                    {{-- Header --}}
+                    <div class="bg-yellow-50 px-6 py-4 border-b border-yellow-100 flex items-center gap-3">
+                        <div class="shrink-0 w-10 h-10 rounded-full bg-yellow-100 flex items-center justify-center">
+                            <svg class="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                            </svg>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-bold text-gray-900">Pertanyaan Terlewat</h3>
+                            <p class="text-xs text-yellow-700">Ada beberapa bagian yang belum Anda isi</p>
+                        </div>
+                    </div>
+                    
+                    {{-- Body --}}
+                    <div class="p-6 max-h-[60vh] overflow-y-auto">
+                        <p class="text-sm text-gray-600 mb-4">Mohon lengkapi pertanyaan berikut sebelum melanjutkan:</p>
+                        <ul class="space-y-2">
+                            <template x-for="(field, index) in incompleteFields" :key="index">
+                                <li class="flex items-start gap-2 text-sm text-gray-700 bg-gray-50 p-2 rounded-lg border border-gray-100">
+                                    <svg class="w-5 h-5 text-yellow-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                    <span x-text="field" class="font-medium"></span>
+                                </li>
+                            </template>
+                        </ul>
+                    </div>
+                    
+                    {{-- Footer --}}
+                    <div class="bg-gray-50 px-6 py-4 border-t border-gray-100 flex justify-end">
+                        <button @click="showIncompleteModal = false" type="button"
+                            class="text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center transition-colors shadow-sm">
+                            Mengerti, Saya Akan Isi
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </template>
 
         {{-- Form Kuesioner --}}
         <form action="{{ route('screening.store') }}" method="POST" x-ref="form">

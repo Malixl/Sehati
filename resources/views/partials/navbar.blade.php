@@ -5,12 +5,8 @@
             <div class="flex items-center justify-between h-16">
                 {{-- Logo --}}
                 <a href="/" class="flex items-center gap-2.5">
-                    <div class="w-8 h-8 bg-blue-700 rounded-lg flex items-center justify-center">
-                        <svg class="w-5 h-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none"
-                            viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                        </svg>
+                    <div class="w-8 h-8 flex items-center justify-center">
+                        <img src="{{ asset('img/Blue.svg') }}" alt="Sehati Logo" class="w-full h-full object-contain">
                     </div>
                     <span class="text-xl font-bold text-gray-900">Sehati</span>
                 </a>
@@ -25,13 +21,13 @@
                         class="px-3 py-2 text-sm font-medium rounded-lg text-gray-700 hover:text-blue-700 hover:bg-blue-50 transition-colors">
                         Tentang
                     </a>
+                    <a href="/#pedoman"
+                        class="px-3 py-2 text-sm font-medium rounded-lg text-gray-700 hover:text-blue-700 hover:bg-blue-50 transition-colors">
+                        Pedoman
+                    </a>
                     <a href="/#tim"
                         class="px-3 py-2 text-sm font-medium rounded-lg text-gray-700 hover:text-blue-700 hover:bg-blue-50 transition-colors">
                         Tim
-                    </a>
-                    <a href="/#faq"
-                        class="px-3 py-2 text-sm font-medium rounded-lg text-gray-700 hover:text-blue-700 hover:bg-blue-50 transition-colors">
-                        FAQ
                     </a>
                     <a href="{{ route('screening.history') }}"
                         class="px-3 py-2 text-sm font-medium rounded-lg text-gray-700 hover:text-blue-700 hover:bg-blue-50 transition-colors {{ request()->routeIs('screening.history') ? 'text-blue-700 bg-blue-50' : '' }}">
@@ -66,10 +62,10 @@
                         class="px-3 py-2.5 text-sm font-medium rounded-lg text-gray-700 hover:bg-gray-50">Beranda</a>
                     <a href="/#tentang"
                         class="px-3 py-2.5 text-sm font-medium rounded-lg text-gray-700 hover:bg-gray-50">Tentang</a>
+                    <a href="/#pedoman"
+                        class="px-3 py-2.5 text-sm font-medium rounded-lg text-gray-700 hover:bg-gray-50">Pedoman</a>
                     <a href="/#tim"
                         class="px-3 py-2.5 text-sm font-medium rounded-lg text-gray-700 hover:bg-gray-50">Tim</a>
-                    <a href="/#faq"
-                        class="px-3 py-2.5 text-sm font-medium rounded-lg text-gray-700 hover:bg-gray-50">FAQ</a>
                     <a href="{{ route('screening.history') }}"
                         class="px-3 py-2.5 text-sm font-medium rounded-lg text-gray-700 hover:bg-gray-50 {{ request()->routeIs('screening.history') ? 'text-blue-700 bg-blue-50' : '' }}">Riwayat</a>
                     <a href="{{ route('login') }}"

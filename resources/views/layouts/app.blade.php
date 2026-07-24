@@ -9,6 +9,7 @@
         content="@yield('meta-description', 'Sehati — Sistem Skrining Kesehatan untuk Diabetes dan Hipertensi')">
 
     <title>@yield('title', 'Sehati — Skrining Kesehatan')</title>
+    <link rel="icon" type="image/svg+xml" href="{{ asset('img/Blue.svg') }}">
 
     {{-- Inter Font --}}
     <link rel="preconnect" href="https://fonts.googleapis.com">

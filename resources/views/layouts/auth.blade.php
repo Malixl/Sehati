@@ -7,6 +7,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <title>@yield('title', 'Sehati')</title>
+    <link rel="icon" type="image/svg+xml" href="{{ asset('img/Blue.svg') }}">
 
     {{-- Inter Font --}}
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -24,6 +25,7 @@
         {{-- Branding --}}
         <div class="text-center mb-8">
             <a href="/" class="inline-flex items-center gap-2">
+                <img src="{{ asset('img/Blue.svg') }}" alt="Sehati Logo" class="h-10 w-10 object-contain">
                 <span class="text-2xl font-bold text-primary-700">Sehati</span>
             </a>
         </div>

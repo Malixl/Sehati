@@ -13,11 +13,7 @@
                     </svg>
                 </button>
                 <a href="/dashboard" class="flex ms-2 md:me-24">
-                    <svg class="h-8 w-8 text-blue-600 me-2" fill="currentColor" viewBox="0 0 24 24"
-                        xmlns="http://www.w3.org/2000/svg">
-                        <path
-                            d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
-                    </svg>
+                    <img src="{{ asset('img/Blue.svg') }}" alt="Sehati Logo" class="h-8 w-8 me-2 object-contain">
                     <span
                         class="self-center text-xl font-bold sm:text-2xl whitespace-nowrap text-blue-900">SEHATI</span>
                 </a>
@@ -27,22 +23,27 @@
 
                 {{-- Notifications --}}
                 <div class="relative ms-3" x-data="{ notificationOpen: false }">
-                    <button type="button" @click="notificationOpen = !notificationOpen" @click.outside="notificationOpen = false" class="relative p-2 text-gray-500 rounded-lg hover:text-gray-900 hover:bg-gray-100 focus:outline-none">
+                    <button type="button" @click="notificationOpen = !notificationOpen"
+                        @click.outside="notificationOpen = false"
+                        class="relative p-2 text-gray-500 rounded-lg hover:text-gray-900 hover:bg-gray-100 focus:outline-none">
                         <span class="sr-only">View notifications</span>
-                        <svg class="w-6 h-6" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
+                        <svg class="w-6 h-6" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
+                            viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9">
+                            </path>
                         </svg>
-                        
+
                         @if(Auth::user()->unreadNotifications->count() > 0)
-                            <div class="absolute inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-white bg-red-500 border-2 border-white rounded-full -top-1 -right-1">
+                            <div
+                                class="absolute inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-white bg-red-500 border-2 border-white rounded-full -top-1 -right-1">
                                 {{ Auth::user()->unreadNotifications->count() }}
                             </div>
                         @endif
                     </button>
-                    
+
                     {{-- Notifications Dropdown --}}
-                    <div x-show="notificationOpen" 
-                        x-transition:enter="transition ease-out duration-100"
+                    <div x-show="notificationOpen" x-transition:enter="transition ease-out duration-100"
                         x-transition:enter-start="transform opacity-0 scale-95"
                         x-transition:enter-end="transform opacity-100 scale-100"
                         x-transition:leave="transition ease-in duration-75"
@@ -56,11 +57,15 @@
                         <ul class="py-1 divide-y divide-gray-100" role="none">
                             @forelse(Auth::user()->notifications()->take(5)->get() as $notification)
                                 <li>
-                                    <a href="{{ route('dashboard.notifications.markAsRead', $notification->id) }}" class="flex px-4 py-3 hover:bg-gray-50 {{ $notification->read_at ? 'opacity-70' : 'bg-blue-50' }}">
+                                    <a href="{{ route('dashboard.notifications.markAsRead', $notification->id) }}"
+                                        class="flex px-4 py-3 hover:bg-gray-50 {{ $notification->read_at ? 'opacity-70' : 'bg-blue-50' }}">
                                         <div class="w-full">
-                                            <div class="text-sm text-gray-900 font-medium mb-1">{{ $notification->data['title'] ?? 'Pemberitahuan Baru' }}</div>
-                                            <div class="text-xs text-gray-500 mb-2">{{ $notification->data['message'] ?? '' }}</div>
-                                            <div class="text-xs text-blue-600">{{ $notification->created_at->diffForHumans() }}</div>
+                                            <div class="text-sm text-gray-900 font-medium mb-1">
+                                                {{ $notification->data['title'] ?? 'Pemberitahuan Baru' }}</div>
+                                            <div class="text-xs text-gray-500 mb-2">
+                                                {{ $notification->data['message'] ?? '' }}</div>
+                                            <div class="text-xs text-blue-600">
+                                                {{ $notification->created_at->diffForHumans() }}</div>
                                         </div>
                                     </a>
                                 </li>
@@ -116,6 +121,10 @@
                             <!-- <li>
                                 <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem">Pengaturan</a>
                             </li> -->
+                            <li>
+                                <a href="/" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                    role="menuitem">Beranda</a>
+                            </li>
                             <li>
                                 <form action="{{ route('logout') }}" method="POST">
                                     @csrf

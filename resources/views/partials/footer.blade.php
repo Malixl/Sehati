@@ -5,12 +5,8 @@
             {{-- Brand --}}
             <div>
                 <div class="flex items-center gap-2.5 mb-4">
-                    <div class="w-8 h-8 bg-blue-700 rounded-lg flex items-center justify-center">
-                        <svg class="w-5 h-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none"
-                            viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                        </svg>
+                    <div class="w-8 h-8 flex items-center justify-center">
+                        <img src="{{ asset('img/Blue.svg') }}" alt="Sehati Logo" class="w-full h-full object-contain">
                     </div>
                     <span class="text-lg font-bold text-gray-900">Sehati</span>
                 </div>
@@ -38,9 +34,12 @@
                         <svg class="w-4 h-4 shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                             stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                         </svg>
-                        <span>sehati@example.com</span>
+                        <a href="https://wa.me/628124490785" target="_blank"
+                            class="hover:text-green-600 transition-colors">
+                            WhatsApp
+                        </a>
                     </li>
                 </ul>
             </div>

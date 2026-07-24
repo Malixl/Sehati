@@ -14,6 +14,35 @@
     {{-- Leaflet CSS --}}
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
 
+    {{--
+    |--------------------------------------------------------------------------
+    | [STORY-7] Panduan Kompresi GZIP/Brotli untuk File GeoJSON
+    |--------------------------------------------------------------------------
+    | Tambahkan konfigurasi berikut di file .htaccess (root project) agar
+    | file .json statis dikompresi otomatis oleh Apache sebelum dikirim ke
+    | browser pengguna. Ini mampu menekan ukuran payload hingga 70-80%.
+    |
+    | # === GZIP Compression untuk GeoJSON ===
+    | <IfModule mod_deflate.c>
+    |     AddOutputFilterByType DEFLATE application/json
+    |     AddOutputFilterByType DEFLATE application/geo+json
+    |     AddOutputFilterByType DEFLATE text/css
+    |     AddOutputFilterByType DEFLATE application/javascript
+    | </IfModule>
+    |
+    | # === Cache Control untuk aset statis ===
+    | <IfModule mod_expires.c>
+    |     ExpiresActive On
+    |     ExpiresByType application/json "access plus 1 week"
+    |     ExpiresByType image/png "access plus 1 month"
+    | </IfModule>
+    |
+    | Untuk Nginx, tambahkan di blok server:
+    |   gzip on;
+    |   gzip_types application/json application/geo+json;
+    |   gzip_min_length 1000;
+    --}}
+
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     <style>
@@ -37,6 +66,38 @@
             margin-right: 6px;
             border-radius: 50%;
             vertical-align: middle;
+        }
+
+        /* Loading Overlay */
+        #map-loading-overlay {
+            position: absolute;
+            top: 64px; /* di bawah navbar */
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(4px);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 999;
+            transition: opacity 0.4s ease-out;
+        }
+        #map-loading-overlay.fade-out {
+            opacity: 0;
+            pointer-events: none;
+        }
+        .map-spinner {
+            width: 48px;
+            height: 48px;
+            border: 4px solid #e5e7eb;
+            border-top-color: #2563eb;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
     </style>
 </head>
@@ -69,6 +130,13 @@
         </div>
     </nav>
 
+    {{-- Loading Overlay (UX Loading State — Langkah 2) --}}
+    <div id="map-loading-overlay">
+        <div class="map-spinner"></div>
+        <p class="mt-4 text-sm font-medium text-gray-600">Memuat data fasilitas kesehatan...</p>
+        <p class="mt-1 text-xs text-gray-400">Mengambil data Puskesmas & Rumah Sakit</p>
+    </div>
+
     {{-- Full-page Map --}}
     <div id="map"></div>
 
@@ -78,6 +146,16 @@
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const statusText = document.getElementById('status-text');
+            const loadingOverlay = document.getElementById('map-loading-overlay');
+
+            /**
+             * Menyembunyikan overlay loading dengan animasi fade-out,
+             * lalu menghapus elemen dari DOM agar tidak mengganggu interaksi peta.
+             */
+            function dismissLoadingOverlay() {
+                loadingOverlay.classList.add('fade-out');
+                setTimeout(() => loadingOverlay.remove(), 400);
+            }
 
             // Default view: Gorontalo
             const defaultLat = 0.5435;
@@ -134,16 +212,30 @@
             };
             legend.addTo(map);
 
-            // Load GeoJSON data
+            /**
+             * [STORY-7 — Langkah 1: Asynchronous Fetch dengan Lazy Loading]
+             *
+             * Kedua file GeoJSON diunduh secara PARALEL menggunakan Promise.all(),
+             * sehingga total waktu = MAX(waktu RS, waktu PK), bukan SUM keduanya.
+             *
+             * File GeoJSON hanya diunduh SETELAH Leaflet selesai diinisialisasi (non-blocking).
+             * Ini mencegah "Render Blocking" karena browser tidak perlu menunggu data geospasial
+             * untuk menampilkan peta dasar (tile layer) terlebih dahulu kepada pengguna.
+             */
             async function loadGeoJSON() {
                 statusText.textContent = 'Memuat data faskes...';
 
                 try {
+                    // Fetch kedua GeoJSON secara paralel (Promise.all) — lebih cepat dari sequential await
+                    const [rsRes, pkRes] = await Promise.all([
+                        fetch('/geojson/RumahSakit.json'),
+                        fetch('/geojson/PusKesmas.json')
+                    ]);
+
                     let rsLayer = null;
                     let pkLayer = null;
 
-                    // Load Rumah Sakit
-                    const rsRes = await fetch('/geojson/RumahSakit.json');
+                    // Parse & render Rumah Sakit
                     if (rsRes.ok) {
                         const rsData = await rsRes.json();
                         rsLayer = L.geoJSON(rsData, {
@@ -163,8 +255,7 @@
                         }).addTo(map);
                     }
 
-                    // Load Puskesmas
-                    const pkRes = await fetch('/geojson/PusKesmas.json');
+                    // Parse & render Puskesmas
                     if (pkRes.ok) {
                         const pkData = await pkRes.json();
                         pkLayer = L.geoJSON(pkData, {
@@ -202,13 +293,20 @@
                     statusText.textContent = 'Data faskes berhasil dimuat ✓';
                     setTimeout(() => { statusText.style.opacity = '0'; }, 3000);
 
+                    // Sembunyikan loading overlay setelah data berhasil dirender
+                    dismissLoadingOverlay();
+
                 } catch (error) {
                     console.error('Gagal memuat GeoJSON:', error);
                     statusText.textContent = '⚠ Gagal memuat data faskes';
+                    dismissLoadingOverlay();
                 }
             }
 
-            // Lazy Loading wrapper for GeoJSON to prevent main-thread blocking
+            /**
+             * Lazy Loading wrapper: menunda eksekusi loadGeoJSON() hingga main thread idle,
+             * sehingga rendering awal peta (tile layer) tidak terganggu oleh proses parsing JSON.
+             */
             function initGeoJSONLazy() {
                 if ('requestIdleCallback' in window) {
                     requestIdleCallback(() => loadGeoJSON());
@@ -248,3 +346,4 @@
 
 </body>
 </html>
+
